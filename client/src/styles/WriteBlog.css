@@ -1,0 +1,18 @@
+.write-blog-form label {
+  font-weight: 600;
+}
+
+.write-blog-form textarea {
+  min-height: 240px;
+}
+
+.ql-container.ql-snow {
+  border: none !important;
+  font: inherit !important;
+  min-height: 10rem;
+}
+
+.ql-editor {
+  max-height: 100vh;
+  overflow: auto;
+}

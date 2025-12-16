@@ -1,0 +1,40 @@
+.blog-list-page {
+  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+  min-height: 100vh;
+}
+
+.search-input {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.search-input .form-control {
+  border: none;
+  padding: 0.75rem 1rem;
+}
+
+.search-input .form-control:focus {
+  box-shadow: none;
+  border-color: none;
+}
+
+.search-input .input-group-text {
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .search-input {
+    margin-bottom: 1rem;
+  }
+
+  .blog-list-page {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .blog-list-page h1 {
+    font-size: 1.75rem;
+  }
+}
