@@ -2,55 +2,52 @@ import React from 'react';
 import { Card, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import type { Blog } from '../types';
+import profileImagePlaceholder from '../assets/common/profile-placeholder.jpg';
+import { FaComment } from "react-icons/fa";
+import { BiSolidLike } from "react-icons/bi";
+import {formatTimeToPeriod} from "../utils/formatDate";
+import DOMPurify from "dompurify";
+import truncate from "html-truncate";
 import '../styles/Blog.css';
 
 interface BlogCardProps {
   blog: Blog;
 }
 
+
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+
+   const truncatedHtml = truncate(blog.content, 120, { ellipsis: "..." });
 
   return (
-    <Link to={`/blog/${blog.id}`} className="blog-card-link">
+    <Link to={`/blog/${blog._id}`} className="blog-card-link">
       <Card className="blog-card h-100 shadow-sm">
         <Card.Body>
-      {blog.image && (
-        <div className="mb-3">
-          <img src={blog.image} alt={blog.title} className="w-100 rounded mb-3" style={{ maxHeight: 160, objectFit: 'cover' }} />
-        </div>
-      )}
+          <h5 className="card-title mb-0 flex-grow-1">{blog.title}</h5>
 
-            <h5 className="card-title mb-0 flex-grow-1">{blog.title}</h5>
-        
-
-          <p className="card-text text-muted small mb-3">{blog.excerpt}</p>
+          <p className="card-text text-muted small mb-3"  dangerouslySetInnerHTML={{
+        __html: DOMPurify.sanitize(truncatedHtml),
+      }}></p>
 
           <div className="blog-footer">
             <div className="d-flex align-items-center gap-2 mb-2">
               <img
-                src={blog.author.avatar}
-                alt={blog.author.username}
+                src={blog.author?.profileImageUrl || profileImagePlaceholder}
+                alt="Username"
                 className="author-avatar"
               />
               <div className="author-info">
-                <p className="mb-0 fw-500">{blog.author.username}</p>
-                <p className="mb-0 text-muted small">{formatDate(blog.createdAt)}</p>
+                <p className="mb-0 fw-500">{blog.author?.username}</p>
+                <p className="mb-0 text-muted small">{formatTimeToPeriod(blog.createdAt)}</p>
               </div>
             </div>
 
             <div className="blog-meta">
               <Badge bg="light" text="dark" className="me-2">
-                💬 {blog.comments.length}
+                <FaComment /> {blog.commentsCount || 0}
               </Badge>
               <Badge bg="light" text="dark">
-                👍 {blog.likes || 0}
+                <BiSolidLike /> {blog.likesCount || 0}
               </Badge>
             </div>
           </div>

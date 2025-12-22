@@ -11,7 +11,8 @@ const commentRouter = require("./routes/comment-routes");
 const { errorHandler } = require("./utils/ExpressError");
 
 const corsOptions = {
-    origin: "http://localhost:5173"
+    origin: "http://localhost:5173",
+    optionsSuccessStatus: 200,
 }
 
 app.use(cors(corsOptions));

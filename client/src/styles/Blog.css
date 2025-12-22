@@ -35,6 +35,10 @@
   line-height: 1.5;
 }
 
+.blog-card .card-text p {
+  margin-bottom: 0;
+}
+
 .author-avatar {
   width: 36px;
   height: 36px;

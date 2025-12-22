@@ -41,10 +41,11 @@ userSchema.pre("save", async function () {
 
 userSchema.methods.generateToken = function (user) {
     const privateKey = process.env.SECRET_KEY;
+    console.log(privateKey)
 
     return jwt.sign({
         id: user._id,
-        fullName: user.fullName,
+        username: user.username,
         email: user.email,
         role: user.role,
     }, privateKey, { algorithm: 'HS256', expiresIn: '1d' },);

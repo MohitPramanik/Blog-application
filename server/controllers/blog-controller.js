@@ -1,5 +1,6 @@
 const Blog = require("../models/blog-model");
 const Comment = require("../models/comment-model");
+const User = require("../models/user-model");
 
 const getAllBlogs = async (req, res) => {
 
@@ -9,7 +10,7 @@ const getAllBlogs = async (req, res) => {
     const skip = (page - 1) * limit;
 
     try {
-        const blogs = await Blog.find().skip(skip).limit(limit);
+        const blogs = await Blog.find().skip(skip).limit(limit).populate("author", "username _id profileImageUrl");
         const totalBlogs = await Blog.countDocuments();
 
         return res.status(200).json({
@@ -27,7 +28,7 @@ const getAllBlogs = async (req, res) => {
 const getIndividualBlog = async (req, res) => {
     try {
         const blogId = req.params.id;
-        const blog = await Blog.findById(blogId);
+        const blog = await Blog.findById(blogId).populate("author", "-password");
 
         return res.status(200).json({
             status: "SUCCESS",
@@ -42,9 +43,10 @@ const getIndividualBlog = async (req, res) => {
 
 const createNewBlog = async (req, res) => {
     try {
-        const { title, content, author, rating, tags, blogImageUrl } = req.body;
+        const { title, content, tags, blogImageUrl } = req.body;
+        const user = await User.findById(req.user.id);
         const newBlog = await Blog.create({
-            title, content, author, rating, tags, blogImageUrl
+            title, content, author: user
         })
 
         return res.status(201).json({

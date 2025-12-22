@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Card, Alert, Spinner, Row, Col } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Auth.css';
 
@@ -11,16 +11,13 @@ const Login: React.FC = () => {
     password: ''
   });
 
-  const { login, loading, error } = useAuth();
-  const navigate = useNavigate();
+  const { login, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await login(loginData.email, loginData.password);
-      navigate('/blogs');
-    } catch {
-      // Error is handled by context
+
+    if(!loading) {
+      login(loginData.email, loginData.password);
     }
   };
 
@@ -41,12 +38,6 @@ const Login: React.FC = () => {
                 <h2 className="mb-4 text-center fw-bold text-primary">
                   Welcome Back
                 </h2>
-
-                {error && (
-                  <Alert variant="danger" dismissible>
-                    {error}
-                  </Alert>
-                )}
 
                 <Form onSubmit={handleSubmit}>
                   <Form.Group className="mb-3">

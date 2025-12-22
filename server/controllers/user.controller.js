@@ -1,5 +1,4 @@
 const User = require("../models/user-model");
-const jwt = require('jsonwebtoken');
 const bcrypt = require("bcrypt");
 
 const getAllUsers = async (req, res) => {
@@ -77,7 +76,14 @@ const loginUser = async (req, res) => {
         return res.status(200).json({
             status: "SUCCESS",
             message: "User logged in successfully",
-            token: user.generateToken(user)
+            token: user.generateToken(user),
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                profileImageUrl: user.profileImageUrl,
+                dob: user.dob
+            }
         });
 
     }
@@ -107,9 +113,20 @@ const getUserById = async (req, res) => {
     }
 }
 
+const checkAuth = async(req, res) => {
+
+    let user = await User.findById(req.user.id).select({password: 0});
+
+    res.status(200).json({
+        success: true,
+        user: user
+    });
+};
+
 module.exports = {
     getAllUsers,
     registerUser,
     loginUser,
-    getUserById
+    getUserById,
+    checkAuth
 }

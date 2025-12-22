@@ -8,259 +8,227 @@ import {
   Form,
   Image,
   Spinner,
-  Alert
+  Alert,
+  Dropdown
 } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import CommentItem from '../components/CommentItem';
+import DOMPurify from "dompurify";
+import truncate from "html-truncate";
 import type { Blog, Comment as CommentType } from '../types';
 import '../styles/BlogDetail.css';
+import api from '../api/axiosInstance';
+import { formatTimeToPeriod } from "../utils/formatDate";
+import profileImagePlaceholder from '../assets/common/profile-placeholder.jpg';
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { MdEdit, MdDelete } from "react-icons/md";
 
 const BlogDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
   const [blog, setBlog] = useState<Blog | null>(null);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [userCommentVotes, setUserCommentVotes] = useState<{ [key: string]: 'like' | 'dislike' | null }>({});
   const [saved, setSaved] = useState(false);
+  const {user} = useAuth();
 
-  // Mock blog data - replace with API call
-  const mockBlogs: { [key: string]: Blog } = {
-    '1': {
-      id: '1',
-      title: 'Getting Started with React Hooks',
-      content: `React Hooks provide a more direct API to the React concepts you already know. Hooks allow you to use state and other React features without writing a class.
+  // const truncatedHtml = truncate(blog.content, 120, { ellipsis: "..." });
 
-Hooks are functions that let you "hook into" React state and lifecycle features from function components. They don't work inside classes — they let you use React without classes.
-
-React provides a few built-in Hooks like useState. You can also create your own Hooks to reuse stateful behavior between different components. We'll look at the built-in Hooks first.
-
-The State Hook is a piece of state, and useState is a Hook that lets you add state to function components. You can call this Hook as many times as you want within a function component. React will preserve the state for this component between re-renders.
-
-Convention dictates that Hook names start with "use" and they make it immediately apparent that they are Hooks when you see them in your code.`,
-      excerpt: 'Learn the fundamentals of React Hooks and how to use them in your projects.',
-      author: {
-        id: '1',
-        username: 'Sarah Johnson',
-        email: 'sarah@example.com',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'
-      },
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      comments: [
-        {
-          id: '1',
-          content: 'This is a great introduction to hooks! Very well explained.',
-          author: {
-            id: '2',
-            username: 'Mike Chen',
-            email: 'mike@example.com',
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike'
-          },
-          blogId: '1',
-          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          likes: 5,
-          dislikes: 0,
-          userVote: null
-        },
-        {
-          id: '2',
-          content: 'Thanks for sharing this! Looking forward to more tutorials.',
-          author: {
-            id: '3',
-            username: 'Emma Wilson',
-            email: 'emma@example.com',
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma'
-          },
-          blogId: '1',
-          createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-          likes: 2,
-          dislikes: 0,
-          userVote: null
-        }
-      ],
-      likes: 12
+  const fetchBlogData = async () => {
+    try {
+      let response = await api.get(`/blog/${id}`);
+      setBlog(response.data.data);
     }
-  };
+    catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-
-    // Simulate API call
     setLoading(true);
-    setTimeout(() => {
-      try {
-        const stored = JSON.parse(localStorage.getItem('blogs') || 'null');
-        if (Array.isArray(stored)) {
-          const found = stored.find((b: any) => b.id === id);
-          if (found) {
-            setBlog(found);
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (err) {
-        // ignore
-      }
+    fetchBlogData();
+    setLoading(false);
+  }, [])
 
-      const foundBlog = mockBlogs[id || '1'];
-      if (foundBlog) {
-        setBlog(foundBlog);
-      } else {
-        navigate('/blogs');
-      }
-      setLoading(false);
-    }, 500);
-  }, [id, isAuthenticated, navigate]);
+  const handleAddComment = () => { }
+
+  console.log(user);
+
+
+  // useEffect(() => {
+
+  //   // Simulate API call
+  //   setLoading(true);
+  //   setTimeout(() => {
+  //     try {
+  //       const stored = JSON.parse(localStorage.getItem('blogs') || 'null');
+  //       if (Array.isArray(stored)) {
+  //         const found = stored.find((b: any) => b.id === id);
+  //         if (found) {
+  //           setBlog(found);
+  //           setLoading(false);
+  //           return;
+  //         }
+  //       }
+  //     } catch (err) {
+  //       // ignore
+  //     }
+
+  //     const foundBlog = mockBlogs[id || '1'];
+  //     if (foundBlog) {
+  //       setBlog(foundBlog);
+  //     } else {
+  //       navigate('/blogs');
+  //     }
+  //     setLoading(false);
+  //   }, 500);
+  // }, [id, isAuthenticated, navigate]);
 
   // track whether current user has saved this blog
-  useEffect(() => {
-    if (!user || !blog) return;
-    try {
-      const key = `saved_blogs_${user.id}`;
-      const arr: string[] = JSON.parse(localStorage.getItem(key) || '[]');
-      setSaved(arr.includes(blog.id));
-    } catch (err) {
-      setSaved(false);
-    }
-  }, [user, blog]);
+  // useEffect(() => {
+  //   if (!user || !blog) return;
+  //   try {
+  //     const key = `saved_blogs_${user.id}`;
+  //     const arr: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+  //     setSaved(arr.includes(blog.id));
+  //   } catch (err) {
+  //     setSaved(false);
+  //   }
+  // }, [user, blog]);
 
-  const toggleSave = () => {
-    if (!user || !blog) return;
-    const key = `saved_blogs_${user.id}`;
-    const arr: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+  // const toggleSave = () => {
+  //   if (!user || !blog) return;
+  //   const key = `saved_blogs_${user.id}`;
+  //   const arr: string[] = JSON.parse(localStorage.getItem(key) || '[]');
 
-    let newArr: string[];
-    if (arr.includes(blog.id)) {
-      newArr = arr.filter((i) => i !== blog.id);
-      setSaved(false);
-    } else {
-      newArr = [blog.id, ...arr];
-      setSaved(true);
-    }
+  //   let newArr: string[];
+  //   if (arr.includes(blog.id)) {
+  //     newArr = arr.filter((i) => i !== blog.id);
+  //     setSaved(false);
+  //   } else {
+  //     newArr = [blog.id, ...arr];
+  //     setSaved(true);
+  //   }
 
-    localStorage.setItem(key, JSON.stringify(newArr));
-  };
+  //   localStorage.setItem(key, JSON.stringify(newArr));
+  // };
 
-  const handleAddComment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // const handleAddComment = async (e: React.FormEvent) => {
+  //   e.preventDefault();
 
-    if (!commentText.trim() || !user || !blog) return;
+  //   if (!commentText.trim() || !user || !blog) return;
 
-    setSubmittingComment(true);
+  //   setSubmittingComment(true);
 
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+  //   try {
+  //     // Simulate API call
+  //     await new Promise(resolve => setTimeout(resolve, 500));
 
-      const newComment: CommentType = {
-        id: String(Math.random()),
-        content: commentText,
-        author: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          avatar: user.avatar
-        },
-        blogId: blog.id,
-        createdAt: new Date().toISOString(),
-        likes: 0,
-        dislikes: 0,
-        userVote: null
-      };
+  //     const newComment: CommentType = {
+  //       id: String(Math.random()),
+  //       content: commentText,
+  //       author: {
+  //         id: user.id,
+  //         username: user.username,
+  //         email: user.email,
+  //         avatar: user.avatar
+  //       },
+  //       blogId: blog.id,
+  //       createdAt: new Date().toISOString(),
+  //       likes: 0,
+  //       dislikes: 0,
+  //       userVote: null
+  //     };
 
-      setBlog({
-        ...blog,
-        comments: [newComment, ...blog.comments]
-      });
+  //     setBlog({
+  //       ...blog,
+  //       comments: [newComment, ...blog.comments]
+  //     });
 
-      setCommentText('');
-    } catch (error) {
-      console.error('Failed to add comment:', error);
-    } finally {
-      setSubmittingComment(false);
-    }
-  };
+  //     setCommentText('');
+  //   } catch (error) {
+  //     console.error('Failed to add comment:', error);
+  //   } finally {
+  //     setSubmittingComment(false);
+  //   }
+  // };
 
-  const handleCommentLike = (commentId: string) => {
-    if (!blog) return;
+  // const handleCommentLike = (commentId: string) => {
+  //   if (!blog) return;
 
-    setUserCommentVotes((prev) => ({
-      ...prev,
-      [commentId]: prev[commentId] === 'like' ? null : 'like'
-    }));
+  //   setUserCommentVotes((prev) => ({
+  //     ...prev,
+  //     [commentId]: prev[commentId] === 'like' ? null : 'like'
+  //   }));
 
-    // Update blog comments
-    const updatedComments = blog.comments.map((comment) => {
-      if (comment.id === commentId) {
-        const currentVote = userCommentVotes[commentId];
-        let likes = comment.likes;
-        let dislikes = comment.dislikes;
+  //   // Update blog comments
+  //   const updatedComments = blog.comments.map((comment) => {
+  //     if (comment.id === commentId) {
+  //       const currentVote = userCommentVotes[commentId];
+  //       let likes = comment.likes;
+  //       let dislikes = comment.dislikes;
 
-        if (currentVote === 'like') {
-          likes -= 1;
-        } else if (currentVote === 'dislike') {
-          dislikes -= 1;
-          likes += 1;
-        } else {
-          likes += 1;
-        }
+  //       if (currentVote === 'like') {
+  //         likes -= 1;
+  //       } else if (currentVote === 'dislike') {
+  //         dislikes -= 1;
+  //         likes += 1;
+  //       } else {
+  //         likes += 1;
+  //       }
 
-        return { ...comment, likes, dislikes, userVote: 'like' as const };
-      }
-      return comment;
-    });
+  //       return { ...comment, likes, dislikes, userVote: 'like' as const };
+  //     }
+  //     return comment;
+  //   });
 
-    setBlog({ ...blog, comments: updatedComments });
-  };
+  //   setBlog({ ...blog, comments: updatedComments });
+  // };
 
-  const handleCommentDislike = (commentId: string) => {
-    if (!blog) return;
+  // const handleCommentDislike = (commentId: string) => {
+  //   if (!blog) return;
 
-    setUserCommentVotes((prev) => ({
-      ...prev,
-      [commentId]: prev[commentId] === 'dislike' ? null : 'dislike'
-    }));
+  //   setUserCommentVotes((prev) => ({
+  //     ...prev,
+  //     [commentId]: prev[commentId] === 'dislike' ? null : 'dislike'
+  //   }));
 
-    // Update blog comments
-    const updatedComments = blog.comments.map((comment) => {
-      if (comment.id === commentId) {
-        const currentVote = userCommentVotes[commentId];
-        let likes = comment.likes;
-        let dislikes = comment.dislikes;
+  //   // Update blog comments
+  //   const updatedComments = blog.comments.map((comment) => {
+  //     if (comment.id === commentId) {
+  //       const currentVote = userCommentVotes[commentId];
+  //       let likes = comment.likes;
+  //       let dislikes = comment.dislikes;
 
-        if (currentVote === 'dislike') {
-          dislikes -= 1;
-        } else if (currentVote === 'like') {
-          likes -= 1;
-          dislikes += 1;
-        } else {
-          dislikes += 1;
-        }
+  //       if (currentVote === 'dislike') {
+  //         dislikes -= 1;
+  //       } else if (currentVote === 'like') {
+  //         likes -= 1;
+  //         dislikes += 1;
+  //       } else {
+  //         dislikes += 1;
+  //       }
 
-        return { ...comment, likes, dislikes, userVote: 'dislike' as const };
-      }
-      return comment;
-    });
+  //       return { ...comment, likes, dislikes, userVote: 'dislike' as const };
+  //     }
+  //     return comment;
+  //   });
 
-    setBlog({ ...blog, comments: updatedComments });
-  };
+  //   setBlog({ ...blog, comments: updatedComments });
+  // };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  // const formatDate = (dateString: string) => {
+  //   return new Date(dateString).toLocaleDateString('en-US', {
+  //     year: 'numeric',
+  //     month: 'long',
+  //     day: 'numeric',
+  //     hour: '2-digit',
+  //     minute: '2-digit'
+  //   });
+  // };
 
   if (loading) {
     return (
@@ -288,22 +256,38 @@ Convention dictates that Hook names start with "use" and they make it immediatel
             {/* Blog Header */}
             <Card className="blog-header-card border-0 shadow-sm mb-4">
               <Card.Body className="p-4">
-                <h1 className="mb-3 fw-bold">{blog.title}</h1>
+                <div className="d-flex justify-content-between">
+                  <h1 className="mb-3 fw-bold">{blog.title}</h1>
+
+                  {/* menu to display only if owned by logged in user */}
+
+                  <Dropdown>
+                    <Dropdown.Toggle className='bg-transparent text-black border-0' id="dropdown-basic">
+                      <BsThreeDotsVertical />
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                      <Dropdown.Item as={Button}> <MdEdit className='me-2' />Edit</Dropdown.Item>
+                      <Dropdown.Item as={Button}><MdDelete className='me-2' />Delete</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
 
                 <div className="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
                   <Image
-                    src={blog.author.avatar}
-                    alt={blog.author.username}
+                    src={blog.author?.profileImageUrl || profileImagePlaceholder}
+                    alt={blog.author?.username || "profile image"}
                     roundedCircle
                     width={48}
                     height={48}
+                    className='object-fit-cover'
                   />
                   <div className="flex-grow-1">
                     <p className="mb-0 fw-bold">{blog.author.username}</p>
-                    <small className="text-muted">{formatDate(blog.createdAt)}</small>
+                    <small className="text-muted">{formatTimeToPeriod(blog.createdAt)}</small>
                   </div>
                   <div className="d-flex align-items-center gap-2">
-                    <Button variant={saved ? 'success' : 'outline-primary'} size="sm" onClick={toggleSave}>
+                    <Button variant={saved ? 'success' : 'outline-primary'} size="sm">
                       {saved ? 'Saved' : 'Save'}
                     </Button>
                     <Button variant="outline-primary" size="sm">
@@ -314,11 +298,11 @@ Convention dictates that Hook names start with "use" and they make it immediatel
 
                 <div className="blog-stats d-flex gap-3 mb-4">
                   <div>
-                    <span className="fw-bold">{blog.likes || 0}</span>
+                    <span className="fw-bold">{blog.likesCount || 0}</span>
                     <span className="text-muted ms-2">Likes</span>
                   </div>
                   <div>
-                    <span className="fw-bold">{blog.comments.length}</span>
+                    <span className="fw-bold">{blog.commentsCount}</span>
                     <span className="text-muted ms-2">Comments</span>
                   </div>
                 </div>
@@ -328,12 +312,9 @@ Convention dictates that Hook names start with "use" and they make it immediatel
             {/* Blog Content */}
             <Card className="blog-content-card border-0 shadow-sm mb-4">
               <Card.Body className="p-4">
-                <div className="blog-content">
-                  {blog.content.split('\n\n').map((paragraph, index) => (
-                    <p key={index} className="mb-3 text-justify">
-                      {paragraph}
-                    </p>
-                  ))}
+                <div className="blog-content" dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(truncate(blog.content, 120, { ellipsis: "..." })),
+                }}>
                 </div>
               </Card.Body>
             </Card>
@@ -341,7 +322,7 @@ Convention dictates that Hook names start with "use" and they make it immediatel
             {/* Comments Section */}
             <Card className="comments-section border-0 shadow-sm">
               <Card.Body className="p-4">
-                <h4 className="mb-4 fw-bold">Comments ({blog.comments.length})</h4>
+                <h4 className="mb-4 fw-bold">Comments ({blog.commentsCount})</h4>
 
                 {/* Add Comment Form */}
                 <Form onSubmit={handleAddComment} className="mb-5 pb-4 border-bottom">
@@ -381,7 +362,7 @@ Convention dictates that Hook names start with "use" and they make it immediatel
                 </Form>
 
                 {/* Comments List */}
-                <div className="comments-list">
+                {/* <div className="comments-list">
                   {blog.comments.length > 0 ? (
                     blog.comments.map((comment) => (
                       <CommentItem
@@ -396,7 +377,7 @@ Convention dictates that Hook names start with "use" and they make it immediatel
                       No comments yet. Be the first to comment!
                     </p>
                   )}
-                </div>
+                </div> */}
               </Card.Body>
             </Card>
           </Col>

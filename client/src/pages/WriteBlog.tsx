@@ -1,37 +1,50 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-// import { useAuth } from '../context/AuthContext';
 import type { Blog } from '../types';
-import '../styles/WriteBlog.css';
 import Editor from '../components/Editor';
+import '../styles/WriteBlog.css';
+import axios from 'axios';
+import api from '../api/axiosInstance';
+import { toast } from 'react-toastify';
 
+type FormDateType = {
+  title: string;
+  content: string;
+  category: string;
+}
 
 const WriteBlog: React.FC = () => {
-  // const { user } = useAuth();
   const navigate = useNavigate();
 
-
-  const [formData, setFormData] = useState<Blog>({
-    title: '',
-    content: '',
-    category: ''
+  const [formData, setFormData] = useState<FormDateType>({
+    title: "",
+    content: "",
+    category: ""
   });
 
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || formData.content === "<p><br></p>" || !formData.content || !formData.category) {
       setError('Title, content, and category are required');
       return;
     }
 
-    console.log(formData);
+    try {
+      let response = await api.post("/blog", formData);
+      toast.success(response.data.message);
+      navigate("/blogs");
+    }
+    catch (error) {
+      if (axios.isAxiosError(error))
+        toast.error(error.response?.data.message);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData((prev: Blog) => {
+    setFormData((prev) => {
       return {
         ...prev,
         [e.target.name]: e.target.value

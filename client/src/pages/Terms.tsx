@@ -47,6 +47,21 @@ const sections = [
     content:
       'We may update these Terms from time to time. Continued use of the platform after changes are posted constitutes acceptance of the revised Terms.',
   },
+  {
+    title: 'Indemnification',
+    content:
+      'You agree to indemnify and hold harmless the platform and its affiliates from any claim arising out of your misuse of the service or violation of these Terms.',
+  },
+  {
+    title: 'Dispute Resolution & Governing Law',
+    content:
+      'Any disputes will be governed by the laws of the jurisdiction where the platform is operated. Parties will attempt to resolve disputes informally before seeking legal recourse.',
+  },
+  {
+    title: 'Third-Party Links & Services',
+    content:
+      'The platform may include links to third-party websites or services; we are not responsible for their content or policies.',
+  },
 ];
 
 const Terms: React.FC = () => {
@@ -55,7 +70,7 @@ const Terms: React.FC = () => {
       <header className="legal-header mb-5">
         <h1 id="terms-title" className="legal-title">Terms of Service</h1>
         <p className="legal-subtitle">
-          Please read these Terms of Service carefully before using the Blogging App.
+          Please read these Terms of Service carefully before using the Blogging App. These terms describe what we expect from users and what you can expect from the service.
         </p>
       </header>
 
@@ -73,7 +88,7 @@ const Terms: React.FC = () => {
         <section className="legal-section legal-contact">
           <h2 className="legal-section-title">Contact Information</h2>
           <p className="legal-text">
-            If you have any questions or concerns regarding these Terms of Service, please contact the site administrator through the official support channels.
+            If you have questions about these Terms or wish to request more information, email <strong>legal@example.com</strong> or contact support through the Support Center.
           </p>
         </section>
       </article>

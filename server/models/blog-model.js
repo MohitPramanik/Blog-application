@@ -29,7 +29,15 @@ const blogSchema = new Schema({
     }],
     blogImageUrl: {
         type: String,
-        default: null
+        default: ""
+    },
+    likesCount: {
+        type: Number,
+        default: 0
+    },
+    commentsCount: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 

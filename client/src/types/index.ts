@@ -1,14 +1,25 @@
-export interface User {
-  id: string;
+export type User = {
+  userId: string;
   username: string;
   email: string;
-  avatar?: string;
+  profileImageUrl?: string;
+  dob?: string;
+  role?: "Admin" | "User" | "";
 }
 
 export interface Blog {
-  title: string,
-  content: string,
-  category: string
+  _id?: string;
+  title: string;
+  content: string;
+  category: string;
+  author: {
+    _id?: string;
+    username: string;
+    profileImageUrl?: string
+  };
+  createdAt: string;
+  likesCount?: number;
+  commentsCount?: number;
 } 
 
 export interface Comment {
@@ -22,13 +33,16 @@ export interface Comment {
   userVote?: 'like' | 'dislike' | null; // Track if current user liked/disliked
 }
 
-export interface AuthContextType {
-  user: User | null;
+export type AuthContextType = {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (username: string, email: string, password: string) => Promise<void>;
-  updateProfile: (data: Partial<User>) => Promise<void>;
-  logout: () => void;
+  user: User | null;
+  login: (username: string, email: string) => void;
+  signup: (username: string, email: string, password: string) => void;
   loading: boolean;
-  error: string | null;
+  logout: () => void;
+  isAuthchecked: boolean;
+}
+
+export type AuthContextProps = {
+  children: React.ReactNode;
 }

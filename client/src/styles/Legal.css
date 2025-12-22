@@ -23,6 +23,13 @@
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
+.privacy-summary {
+  background: #f8fafc;
+  border-left: 4px solid #6366f1;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+}
+
 .legal-section {
   display: flex;
   gap: 1rem;
@@ -47,7 +54,34 @@
   line-height: 1.75;
 }
 
+.legal-aside-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 6px 18px rgba(18, 38, 63, 0.04);
+}
+
+.toc a {
+  color: #0d6efd;
+  text-decoration: none;
+}
+
+.toc a:hover {
+  text-decoration: underline;
+}
+
 .legal-contact {
   border-top: 1px solid #e5e7eb;
   padding-top: 1.5rem;
+}
+
+@media (max-width: 767.98px) {
+  .legal-aside-card {
+    margin-top: 1rem;
+  }
+
+  .legal-section {
+    flex-direction: column;
+  }
 }
