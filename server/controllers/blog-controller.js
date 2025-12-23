@@ -10,7 +10,7 @@ const getAllBlogs = async (req, res) => {
     const skip = (page - 1) * limit;
 
     try {
-        const blogs = await Blog.find().skip(skip).limit(limit).populate("author", "username _id profileImageUrl");
+        const blogs = await Blog.find().skip(skip).limit(limit).populate("author", "username _id profileImageUrl").sort({ createdAt: -1 });
         const totalBlogs = await Blog.countDocuments();
 
         return res.status(200).json({

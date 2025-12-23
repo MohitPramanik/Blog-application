@@ -1,5 +1,4 @@
 .blog-detail-page {
-  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
   min-height: 100vh;
 
   .dropdown-toggle::after {
@@ -10,6 +9,27 @@
     left: auto !important;
     right: 0 !important;
     width: max-content;
+    background-color: var(--nav-bg) !important;
+
+    button:hover {
+      background-color: #4158ff !important;
+      color: white !important;
+    }
+  }
+}
+
+.blog-update-toggle-menu {
+  border: 0;
+  color: var(--text-color);
+}
+
+.theme-dark {
+  .dropdown-menu {
+    border: 1px solid #ffffff47 !important;
+  }
+
+  .search-input {
+    box-shadow: 0 2px 8px rgb(229 229 229 / 10%);
   }
 }
 

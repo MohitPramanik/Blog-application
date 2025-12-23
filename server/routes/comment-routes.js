@@ -5,11 +5,9 @@ const { isLoggedIn } = require('../middlewares/auth-middleware');
 const router = Router();
 
 
-router.route("/")
-    .post(isLoggedIn, commentController.createNewComment); // create new comment
-
 router.route("/:id")
     .get(isLoggedIn, commentController.getAllComments)  // get all comments    
+    .post(isLoggedIn, commentController.createNewComment) // create new comment
     .put(isLoggedIn, commentController.updateComment)  // update comment
     .delete(isLoggedIn, commentController.deleteComment); // delete comment
 

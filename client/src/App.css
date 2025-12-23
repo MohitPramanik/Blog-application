@@ -28,13 +28,11 @@ a:hover {
   color: #667eea;
 }
 
-button {
-  transition: all 0.2s ease;
-}
 
 button:disabled {
-  opacity: 0.6;
+  opacity: 0.8 !important;
   cursor: not-allowed;
+  pointer-events: all !important;
 }
 
 .fw-500 {
@@ -71,6 +69,16 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.Toastify__toast-theme--light {
+  background-color: var(--nav-bg) !important;
+  color: inherit !important;
+  border: 1px solid #efefef40;
+}
+
+.Toastify__toast-container--top-right  {
+  background-color: transparent !important;
 }
 
 /* Responsive utilities */

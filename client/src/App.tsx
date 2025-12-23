@@ -185,7 +185,6 @@ import Footer from './components/Footer';
 import Notifications from './components/Notifications';
 import { NotificationProvider } from './context/NotificationContext';
 import NotFound from './pages/NotFound';
-import { useEffect } from 'react';
 
 const App: React.FC = () => {
   return (

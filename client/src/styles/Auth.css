@@ -1,11 +1,22 @@
 .auth-page {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: black !important;
+
+  .container {
+    background-color: transparent !important;
+  }
+
+  input::placeholder {
+    color: inherit !important;
+  }
 }
 
 .auth-card {
   border: none;
   border-radius: 12px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: white !important;
+  overflow: hidden;
 }
 
 .auth-card:hover {
@@ -30,6 +41,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: white !important;
 }
 
 .submit-btn:hover:not(:disabled) {

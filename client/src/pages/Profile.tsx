@@ -91,7 +91,7 @@ const Profile: React.FC = () => {
             </Form.Group>
 
             <div className="d-flex gap-2 justify-content-end">
-              <Button type="submit" className="btn-primary">Save</Button>
+              <Button type="submit" className="primary-btn">Save</Button>
             </div>
           </div>
         </Form>

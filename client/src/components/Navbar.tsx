@@ -80,8 +80,8 @@ const NavBar: React.FC = () => {
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => toggleTheme("light")}><RiSunFill className='fs-5 me-1' /> Light Mode</Dropdown.Item>
-                    <Dropdown.Item onClick={() => toggleTheme("dark")}><BsMoonStarsFill className='fs-6 me-2' /> Dark Mode</Dropdown.Item>
+                    <Dropdown.Item as={"button"} className={`${theme === "light" ? "active-theme-btn": ""}`} onClick={() => toggleTheme("light")}><RiSunFill className='fs-5 me-1' /> Light Mode</Dropdown.Item>
+                    <Dropdown.Item as={"button"} className={`${theme === "dark" ? "active-theme-btn": ""}`} onClick={() => toggleTheme("dark")}><BsMoonStarsFill className='fs-6 me-2' /> Dark Mode</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
 

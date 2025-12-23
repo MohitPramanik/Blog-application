@@ -57,9 +57,20 @@
   border: 1px solid gray;
   font-size: 100%;
   transform: translate(100%, -100%);
-  background-color: white;
+  background-color: white !important;
   cursor: pointer;
 }
+
+.theme-dark {
+  .profile-card {
+    box-shadow: 0 6px 18px rgb(255 255 255 / 5%);
+  }
+
+  .camera-label {
+    background-color: inherit !important;
+  }
+}
+
 
 /* Small screens: stack the layout */
 @media (max-width: 767.98px) {

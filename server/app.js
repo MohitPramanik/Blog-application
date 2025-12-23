@@ -11,11 +11,11 @@ const commentRouter = require("./routes/comment-routes");
 const { errorHandler } = require("./utils/ExpressError");
 
 const corsOptions = {
-    origin: "http://localhost:5173",
+    origins: ["http://localhost:5173", "https://t2jl0gdq-5173.inc1.devtunnels.ms"],
     optionsSuccessStatus: 200,
 }
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

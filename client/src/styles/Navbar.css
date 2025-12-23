@@ -1,5 +1,6 @@
 .navbar-custom {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #ffffff29;
 }
 
 .logout-btn {
@@ -8,6 +9,27 @@
 
 .logout-btn:hover {
   transform: scale(1.05);
+}
+
+.active-theme-btn.dropdown-item {
+  background-color: #4158ff !important;
+  color: white !important;
+
+  &:hover {
+    background-color: #4158ff !important;
+  }
+}
+
+nav {
+  .dropdown-item {
+    svg {
+      background-color: transparent !important;
+    }
+
+    &:hover {
+      background-color: #4157ff71 !important;
+    }
+  }
 }
 
 @media (max-width: 991px) {

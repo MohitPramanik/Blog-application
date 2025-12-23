@@ -16,6 +16,12 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
 }
 
+.theme-dark {
+  .blog-card:hover {
+    box-shadow: 0 12px 20px rgb(193 193 193 / 18%) !important;
+  }
+}
+
 .blog-card .card-title {
   font-size: 1.25rem;
   font-weight: 600;

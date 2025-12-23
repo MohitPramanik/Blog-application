@@ -17,10 +17,9 @@
 }
 
 .legal-card {
-  background: #ffffff;
   border-radius: 16px;
   padding: 2.5rem;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--bs-box-shadow-md);
 }
 
 .privacy-summary {

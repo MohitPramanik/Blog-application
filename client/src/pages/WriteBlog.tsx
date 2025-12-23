@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import type { Blog } from '../types';
-import Editor from '../components/Editor';
+// import Editor from '../components/Editor';
 import '../styles/WriteBlog.css';
 import axios from 'axios';
 import api from '../api/axiosInstance';
@@ -27,7 +26,7 @@ const WriteBlog: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || formData.content === "<p><br></p>" || !formData.content || !formData.category) {
+    if (!formData.title || !formData.content || !formData.category) {
       setError('Title, content, and category are required');
       return;
     }
@@ -52,9 +51,9 @@ const WriteBlog: React.FC = () => {
     });
   }
 
-  const handleContentChange = (value: string) => {
-    setFormData(prev => ({ ...prev, content: value }));
-  };
+  // const handleContentChange = (value: string) => {
+  //   setFormData(prev => ({ ...prev, content: value }));
+  // };
 
   return (
     <Container className="py-5">
@@ -65,12 +64,13 @@ const WriteBlog: React.FC = () => {
 
         <Form.Group className="mb-3" controlId="title">
           <Form.Label>Title</Form.Label>
-          <Form.Control value={formData.title} name='title' onChange={handleChange} />
+          <Form.Control value={formData.title} placeholder='Your Blog Title...' name='title' onChange={handleChange} />
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="content">
           <Form.Label>Content</Form.Label>
-          <Editor onChange={handleContentChange} />
+          {/* <Editor onChange={handleContentChange} /> */}
+          <Form.Control as={'textarea'} placeholder='Write here...' rows={4} className='content-textarea' value={formData.content} name='content' onChange={handleChange} />
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -86,7 +86,7 @@ const WriteBlog: React.FC = () => {
 
 
         <div className="d-flex gap-2">
-          <Button type="submit">Publish</Button>
+          <Button type="submit" className='primary-btn'>Publish</Button>
           <Button variant="secondary" onClick={() => navigate('/blogs')}>Cancel</Button>
         </div>
       </Form>

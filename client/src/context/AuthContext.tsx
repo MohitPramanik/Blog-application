@@ -39,9 +39,9 @@ const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
         let response = await api.get("/user/check");
         if (response.data.user) {
           setIsAuthenticated(true);
-          let { id, username, email, role, profileImageUrl, dob } = response.data.user;
+          let { _id, username, email, role, profileImageUrl, dob } = response.data.user;
           setUser({
-            userId: id,
+            userId: _id,
             username,
             email,
             profileImageUrl,
@@ -60,8 +60,6 @@ const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
         setLoading(false);
         setIsAuthChecked(true); // to make the UI stop from navigating until the authentication is checked for already logged in user
       }
-
-      console.log(isAuthenticated);
     }
 
     checkAuth();
@@ -75,7 +73,7 @@ const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
       });
 
 
-      let { id, username, profileImageUrl, dob, role } = response.data;
+      let { id, username, profileImageUrl, dob, role } = response.data.user;
       setUser({ userId: id, username, email, dob, profileImageUrl, role });
       localStorage.setItem("token", response.data.token);
       setIsAuthenticated(true);

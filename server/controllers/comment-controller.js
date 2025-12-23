@@ -1,4 +1,6 @@
 const Comment = require('../models/comment-model');
+const Blog = require("../models/blog-model");
+const User = require("../models/user-model");
 
 const getAllComments = async (req, res) => {
     try {
@@ -6,10 +8,10 @@ const getAllComments = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
-        
-        const comments = await Comment.find({ relatedBlog: blogId }).skip(skip).limit(limit);
-        const totalComments = await Comment.countDocuments({ relatedBlog: blogId });
-        
+
+        const comments = await Comment.find({ blog: blogId }).skip(skip).limit(limit).sort({ createdAt: -1 }).populate("author", "username profileImageUrl");
+        const totalComments = await Comment.countDocuments({ blog: blogId });
+
         return res.status(200).json({
             status: "SUCCESS",
             data: comments,
@@ -23,12 +25,29 @@ const getAllComments = async (req, res) => {
 
 const createNewComment = async (req, res) => {
     try {
-        const { author, relatedBlog, content } = req.body;
+        const { id: blogId } = req.params;
+        const { content } = req.body;
+
+        const blog = await Blog.findById(blogId);
+
+        if (!blog) {
+            return res.status(400).json({
+                status: "ERROR",
+                message: "Blog not found"
+            })
+        }
+
         const newComment = await Comment.create({
-            author: author,
-            relatedBlog: relatedBlog,
-            content: content
+            blog: blog,
+            content: content,
+            author: req.user.id
         });
+
+
+        await Blog.findByIdAndUpdate(
+            blogId,
+            { $inc: { commentsCount: 1 } }
+        );
 
         return res.status(201).json({
             status: "SUCCESS",
@@ -87,6 +106,13 @@ const deleteComment = async (req, res) => {
         }
 
         await Comment.findByIdAndDelete(commentId);
+
+        // Decrement comment count
+        await Blog.findOneAndUpdate(
+            { _id: comment.blog, commentsCount: { $gt: 0 } },
+            { $inc: { commentsCount: -1 } }
+        );
+
 
         return res.status(200).json({
             status: "SUCCESS",
