@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 // import Editor from '../components/Editor';
@@ -6,6 +6,7 @@ import '../styles/WriteBlog.css';
 import axios from 'axios';
 import api from '../api/axiosInstance';
 import { toast } from 'react-toastify';
+import { useBlog } from '../context/BlogContext';
 
 type FormDateType = {
   title: string;
@@ -23,6 +24,11 @@ const WriteBlog: React.FC = () => {
   });
 
   const [error, setError] = useState<string | null>(null);
+  const { blogCategories, getAllBlogsCategories } = useBlog();
+
+  useEffect(() => {
+    getAllBlogsCategories();
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,10 +82,12 @@ const WriteBlog: React.FC = () => {
         <Form.Group className="mb-3">
           <Form.Label>Category</Form.Label>
           <Form.Select aria-label="Default select example" onChange={handleChange} name='category' value={formData.category}>
-            <option>Select</option>
-            <option value="Acedemics">Acedemics</option>
-            <option value="Education">Education</option>
-            <option value="Technology">Technology</option>
+              <option>Select</option>
+              {
+                blogCategories.map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))
+              }
           </Form.Select>
         </Form.Group>
 

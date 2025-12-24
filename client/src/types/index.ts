@@ -1,3 +1,5 @@
+import type { SetStateAction } from "react";
+
 export type User = {
   userId: string;
   username: string;
@@ -43,6 +45,16 @@ export type AuthContextType = {
   isAuthchecked: boolean;
 }
 
+export type BlogContextType = {
+  blogCategories: [];
+  getAllBlogsCategories: () => void;
+  loading: boolean;
+}
+
 export type AuthContextProps = {
+  children: React.ReactNode;
+}
+
+export type BlogContextProps = {
   children: React.ReactNode;
 }

@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import BlogCard from '../components/BlogCard';
 import type { Blog } from '../types';
 import '../styles/BlogList.css';
 import Loader from '../components/Loader';
 import api from '../api/axiosInstance';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const BlogList: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
 
   const fetchBlogs = async () => {
     try {
@@ -32,20 +35,46 @@ const BlogList: React.FC = () => {
     }, 500)
   }, []);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-
-    if (term === '') {
-      setFilteredBlogs(blogs);
-    } else {
-      const filtered = blogs.filter(
-        (blog) =>
-          blog.title.toLowerCase().includes(term)
-      );
-      setFilteredBlogs(filtered);
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
   };
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+
+      // to change url based on search
+      if (!searchText.length) {
+        setSearchParams()
+      }
+      else {
+        setSearchParams({
+          search: searchText,
+        });
+      }
+
+      /* 
+        to stop preventing api call when there is nothing to search in searchbox 
+        or when already have results for the searched element and still searching for the same
+      */
+      if ((!searchParams.size && !searchText.length) || (searchParams.get("search") === searchText)) {
+        return;
+      }
+
+      let response = await api.get(`blog?search=${searchText}`);
+      setBlogs(response.data.data);
+
+    }
+    catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.message);
+      }
+    }
+    finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="blog-list-page">
@@ -59,14 +88,14 @@ const BlogList: React.FC = () => {
 
         <Row className="mb-4">
           <Col md={8}>
-            <InputGroup className="search-input">
-              <InputGroup.Text className="bg-white border-end-0">
+            <InputGroup as={"form"} onSubmit={handleSearch} className="search-input">
+              <InputGroup.Text as={"button"} className="bg-white border-end-0">
                 🔍
               </InputGroup.Text>
               <Form.Control
                 placeholder="Search blogs by title, content, or author..."
-                value={searchTerm}
-                onChange={handleSearch}
+                value={searchText}
+                onChange={handleChange}
                 className="border-start-0"
               />
             </InputGroup>
@@ -94,7 +123,7 @@ const BlogList: React.FC = () => {
               <div className="text-center py-5">
                 <h3 className="text-muted">No blogs found</h3>
                 <p className="text-muted">
-                  {searchTerm
+                  {searchText
                     ? 'Try searching with different keywords'
                     : 'No blogs available at the moment'}
                 </p>

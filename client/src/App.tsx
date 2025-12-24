@@ -27,6 +27,13 @@ const AppContent: React.FC = () => {
   const { isAuthchecked, loading } = useAuth();
   const path = useLocation().pathname;
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, [path])
+
   if (loading || !isAuthchecked) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100">
@@ -185,6 +192,8 @@ import Footer from './components/Footer';
 import Notifications from './components/Notifications';
 import { NotificationProvider } from './context/NotificationContext';
 import NotFound from './pages/NotFound';
+import BlogContextProvider from './context/BlogContext';
+import { useEffect } from 'react';
 
 const App: React.FC = () => {
   return (
@@ -192,7 +201,9 @@ const App: React.FC = () => {
       <ThemeProvider>
         <AuthProvider>
           <NotificationProvider>
-            <AppContent />
+            <BlogContextProvider>
+              <AppContent />
+            </BlogContextProvider>
             <Notifications />
           </NotificationProvider>
         </AuthProvider>

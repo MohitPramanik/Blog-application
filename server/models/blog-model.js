@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const { blogCategories } = require('../utils/constants');
 
 const blogSchema = new Schema({
     title: {
@@ -18,15 +19,16 @@ const blogSchema = new Schema({
         ref: "User",
         required: true
     },
-    rating: {
-        type: Number,
-        min: 1,
-        max: 5,
-    },
     tags: [{
         type: String,
         maxLength: 30
     }],
+
+    category: {
+        type: String,
+        enum: blogCategories,
+        required: true
+    },
     blogImageUrl: {
         type: String,
         default: ""
