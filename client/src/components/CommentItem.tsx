@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Button, Image, Badge, Dropdown } from 'react-bootstrap';
+import { Card, Button, Image, Dropdown } from 'react-bootstrap';
 import profileImgagePlaceholder from '../assets/common/profile-placeholder.jpg';
 import { formatTimeToPeriod } from "../utils/formatDate";
 import '../styles/Comment.css';

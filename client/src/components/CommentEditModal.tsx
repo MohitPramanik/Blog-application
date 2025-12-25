@@ -2,9 +2,6 @@ import { Button, Modal, Form } from 'react-bootstrap'
 import "../styles/CommentEditModal.css";
 import type { EditingCommentType } from '../types';
 import { useEffect, useState } from 'react';
-import api from '../api/axiosInstance';
-import { toast } from 'react-toastify';
-import axios from 'axios';
 
 type CommentEditModalType = {
     editingComment: EditingCommentType | null;
