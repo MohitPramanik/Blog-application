@@ -1,28 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Spinner, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import BlogCard from '../components/BlogCard';
 import type { Blog } from '../types';
 import '../styles/BlogList.css';
+import api from '../api/axiosInstance';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const SavedBlogs: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+
+  const fetchSavedBlogs = async () => {
+    try {
+      setLoading(true);
+      let response = await api.get("/user/saved-blogs");
+      setBlogs(response.data.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.message);
+      }
+      console.log(error);
+    }
+    finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-
-    setLoading(true);
-    setTimeout(() => {
-      try {
-      } catch (err) {
-        setBlogs([]);
-      }
-      setLoading(false);
-    }, 400);
-  }, [isAuthenticated, navigate, user]);
+    fetchSavedBlogs();
+  }, [])
 
   return (
     <div className="blog-list-page">
@@ -48,11 +55,6 @@ const SavedBlogs: React.FC = () => {
                   <Col key={index} xs={12} md={6} lg={4}>
                     <div>
                       <BlogCard blog={blog} />
-                      <div className="mt-2 text-end">
-                        <Button size="sm" variant="outline-danger">
-                          Unsave
-                        </Button>
-                      </div>
                     </div>
                   </Col>
                 ))}

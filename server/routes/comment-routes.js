@@ -11,4 +11,14 @@ router.route("/:id")
     .put(isLoggedIn, commentController.updateComment)  // update comment
     .delete(isLoggedIn, commentController.deleteComment); // delete comment
 
+
+router.route("/:id/like")
+    .put(isLoggedIn, commentController.likeComment); // to like the comment
+
+
+router.route("/:id/dislike")
+    .put(isLoggedIn, commentController.dislikeComment); // to dislike the comment
+
+
+
 module.exports = router;

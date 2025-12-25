@@ -1,0 +1,13 @@
+.comment-modal.modal.show .modal-dialog {
+   background: none !important;
+}
+
+.comment-modal.modal.show {
+    backdrop-filter: blur(3px);
+    background-color: rgba(0, 0, 0, 0.452) !important;
+}
+
+.modal-content {
+    background-color: var(--nav-bg) !important;
+    opacity: 1;
+}

@@ -5,7 +5,6 @@ import NavBar from './components/Navbar';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import BlogList from './pages/BlogList';
-import BlogDetail from './pages/BlogDetail';
 import WriteBlog from './pages/WriteBlog';
 import Profile from './pages/Profile';
 import NotificationsPage from './pages/Notifications';
@@ -61,7 +60,7 @@ const AppContent: React.FC = () => {
             path="/blog/:id"
             element={
               <ProtectedRoute>
-                <BlogDetail />
+                <BlogWrapper />
               </ProtectedRoute>
             }
           />
@@ -194,6 +193,7 @@ import { NotificationProvider } from './context/NotificationContext';
 import NotFound from './pages/NotFound';
 import BlogContextProvider from './context/BlogContext';
 import { useEffect } from 'react';
+import BlogWrapper from './pages/BlogWrapper';
 
 const App: React.FC = () => {
   return (

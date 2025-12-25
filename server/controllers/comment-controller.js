@@ -1,6 +1,5 @@
 const Comment = require('../models/comment-model');
 const Blog = require("../models/blog-model");
-const User = require("../models/user-model");
 
 const getAllComments = async (req, res) => {
     try {
@@ -9,12 +8,27 @@ const getAllComments = async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        const comments = await Comment.find({ blog: blogId }).skip(skip).limit(limit).sort({ createdAt: -1 }).populate("author", "username profileImageUrl");
+        const userId = req.user.id; // required for mapping isLiked variable with the comment for logged in user
+
+        const comments = await Comment.find({ blog: blogId })
+                                      .skip(skip)
+                                      .limit(limit)
+                                      .sort({ createdAt: -1 })
+                                      .populate("author", "username profileImageUrl")
+                                      .lean();
         const totalComments = await Comment.countDocuments({ blog: blogId });
+
+        const mappedComments = comments.map((comment) => {
+            return {
+                ...comment, 
+                isLiked: comment?.likedBy?.some(id => id.toString() === userId),
+                likedCount: comment?.likedBy?.length
+            }
+        })
 
         return res.status(200).json({
             status: "SUCCESS",
-            data: comments,
+            data: mappedComments,
             total_records_count: totalComments
         });
     }
@@ -28,26 +42,25 @@ const createNewComment = async (req, res) => {
         const { id: blogId } = req.params;
         const { content } = req.body;
 
-        const blog = await Blog.findById(blogId);
 
-        if (!blog) {
-            return res.status(400).json({
+        const updatedBlog = await Blog.findByIdAndUpdate(
+            { _id: blogId },
+            { $inc: { commentsCount: 1 } },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedBlog) {
+            return res.status(404).json({
                 status: "ERROR",
                 message: "Blog not found"
             })
         }
 
         const newComment = await Comment.create({
-            blog: blog,
+            blog: updatedBlog,
             content: content,
             author: req.user.id
         });
-
-
-        await Blog.findByIdAndUpdate(
-            blogId,
-            { $inc: { commentsCount: 1 } }
-        );
 
         return res.status(201).json({
             status: "SUCCESS",
@@ -62,65 +75,126 @@ const createNewComment = async (req, res) => {
 const updateComment = async (req, res) => {
     try {
         const commentId = req.params.id;
-        const { content, likes, dislikes } = req.body;
+        const { content } = req.body;
+        const authorId = req.user.id;
 
-        const comment = await Comment.findById(commentId);
-
-        if (!comment) {
-            return res.status(404).json({ message: "Comment Not Found" });
-        }
-
-        if (comment.author !== req.user._id) {
+        const updatedComment = await Comment.findOneAndUpdate(
             {
-                return res.status(403).json({
-                    status: "FAILED",
-                    message: "You are not authorized to update this comment."
-                });
+                _id: commentId,
+                author: authorId
+            },
+            {
+                $set: { content }
+            },
+            {
+                runValidators: true
             }
+        )
+
+        if (!updatedComment) {
+            return res.status(404).json({ message: "Comment Not Found or you are not authorized" });
         }
-        await Comment.findByIdAndUpdate(commentId, {
-            ...comment,
-            content, likes, dislikes
-        }, { runValidators: true });
+
+        return res.status(200).json({
+            status: "SUCCESS",
+            message: "Comment updated successfully"
+        })
 
     } catch (error) {
-        return res.status(500).json({ message: "Server Error", error: error.message });
+        return res.status(500).json(
+            {
+                status: "FAILED",
+                message: "Failed to update the comment",
+                error: error.message
+            }
+        );
     }
 }
 
 const deleteComment = async (req, res) => {
     try {
         const commentId = req.params.id;
+        const authorId = req.user.id;
 
-        const comment = await Comment.findById(commentId);
-
-        if (!comment) {
-            return res.status(404).json({ message: "Comment Not Found" });
-        }
-
-        if (comment.author.toString() !== req.user.id) {
-            return res.status(403).json({
-                status: "FAILED",
-                message: "You are not authorized to delete this comment."
-            });
-        }
-
-        await Comment.findByIdAndDelete(commentId);
-
-        // Decrement comment count
-        await Blog.findOneAndUpdate(
-            { _id: comment.blog, commentsCount: { $gt: 0 } },
-            { $inc: { commentsCount: -1 } }
+        const deletedComment = await Comment.findOneAndDelete(
+            {
+                _id: commentId,
+                author: authorId
+            }
         );
 
+        if (!deletedComment) {
+            return res.status(404).json({ message: "Comment Not Found or you are not authorized" });
+        }
+
+        // Decrement comment count from blog if the comment is deleted
+        await Blog.findOneAndUpdate(
+            { _id: deletedComment.blog, commentsCount: { $gt: 0 } },
+            { $inc: { commentsCount: -1 } }
+        );
 
         return res.status(200).json({
             status: "SUCCESS",
             message: "Comment Deleted Successfully"
         });
 
-    } catch (error) {
-        return res.status(500).json({ message: "Server Error", error: error.message });
+    }
+    catch (error) {
+        return res.status(500).json(
+            {
+                status: "FAILED",
+                message: "Failed to delete the comment",
+                error: error.message
+            }
+        );
+    }
+}
+
+const likeComment = async (req, res) => {
+    const userId = req.user.id;
+    const commentId = req.params.id;
+
+    try {
+        const result = await Comment.findOneAndUpdate(
+            { _id: commentId },
+            { $addToSet: { likedBy: userId } }
+        )
+
+        return res.status(200).json({
+            status: "SUCCESS",
+            commentId: result._id
+        })
+    }
+    catch (error) {
+        return res.status(500).json({
+            status: "FAILED",
+            message: "Server Error",
+            error: error.message
+        })
+    }
+}
+
+const dislikeComment = async (req, res) => {
+    const userId = req.user.id;
+    const commentId = req.params.id;
+
+    try {
+        const result = await Comment.findOneAndUpdate(
+            { _id: commentId },
+            { $pull: { likedBy: userId } }
+        );
+
+        return res.status(200).json({
+            status: "SUCCESS",
+            commentId: result._id
+        })
+    }
+    catch (error) {
+        return res.status(500).json({
+            status: "FAILED",
+            message: "Server Error",
+            error: error.message
+        })
     }
 }
 
@@ -128,5 +202,7 @@ module.exports = {
     getAllComments,
     createNewComment,
     updateComment,
-    deleteComment
+    deleteComment,
+    likeComment,
+    dislikeComment
 };

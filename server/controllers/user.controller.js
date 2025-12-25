@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const User = require("../models/user-model");
 const bcrypt = require("bcrypt");
 
@@ -113,20 +114,206 @@ const getUserById = async (req, res) => {
     }
 }
 
-const checkAuth = async(req, res) => {
+const checkAuth = async (req, res) => {
 
-    let user = await User.findById(req.user.id).select({password: 0});
+    let user = await User.findById(req.user.id).select({ password: 0 });
 
-    res.status(200).json({
+    return res.status(200).json({
         success: true,
         user: user
     });
 };
+
+const saveBlog = async (req, res) => {
+    const { blogId } = req.params;
+    const userId = req.user.id;
+
+    try {
+        await User.findByIdAndUpdate(userId, {
+            $addToSet: { savedBlogs: blogId }
+        })
+
+        return res.status(200).json({
+            status: "SUCCESS",
+            message: "Blog saved successfully"
+        })
+    }
+    catch (error) {
+        return res.status(500).json({
+            status: "FAILED",
+            message: "Failed to save the blog",
+            error: error.message
+        })
+    }
+}
+
+const unsaveBlog = async (req, res) => {
+    const { blogId } = req.params;
+    const userId = req.user.id;
+
+    try {
+        await User.findByIdAndUpdate(userId, {
+            $pull: { savedBlogs: blogId }
+        })
+
+        return res.status(200).json({
+            status: "SUCCESS",
+            message: "Blog removed from saved list"
+        })
+    }
+    catch (error) {
+        return res.status(500).json({
+            status: "FAILED",
+            message: "Failed to remove blog from saved list",
+            error: error.message
+        })
+    }
+}
+
+
+const getSavedBlogs = async (req, res) => {
+    try {
+
+        let { id: userId } = req.user;
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+
+        let result =
+            await User.findById(userId)
+                .select({ savedBlogs: 1 })
+                .populate("savedBlogs")
+                .skip(skip)
+                .limit(limit)
+                .lean();
+
+        return res.status(200).json({
+            status: "SUCCESS",
+            data: result.savedBlogs
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            status: "FAILED",
+            message: "Failed to fetch the saved blogs",
+            error: error.message
+        })
+    }
+}
+
+
+const followAnotherProfile = async (req, res) => {
+    try {
+        const currentProfileId = req.user.id;
+        const anotherProfileId = req.body.profileId;
+
+        // Prevent self-follow
+        if (currentProfileId === anotherProfileId) {
+            return res.status(400).json(
+                {
+                    status: "FAILED",
+                    message: "You cannot follow yourself"
+                }
+            );
+        }
+
+        // Check if already following
+        const alreadyFollowing = await User.findOne({
+            _id: currentProfileId,
+            followingList: anotherProfileId
+        });
+
+        if (alreadyFollowing) {
+            return res.status(400).json(
+                {
+                    status: "FAILED",
+                    message: "You are already following this user"
+                }
+            );
+        }
+
+        // Perform for current user
+        await User.findByIdAndUpdate(
+            currentProfileId,
+            { $addToSet: { followingList: anotherProfileId } }
+        );
+
+        // for another profile user
+        await User.findByIdAndUpdate(
+            anotherProfileId,
+            { $inc: { followersCount: 1 } }
+        );
+
+        return res.status(200).json(
+            {
+                status: "SUCCESS",
+                message: "User followed successfully"
+            }
+        );
+    }
+    catch (error) {
+        return res.status(500).json(
+            {
+                status: "FAILED",
+                message: "Failed to follow user",
+                error: error.message
+            }
+        );
+    }
+};
+
+const unfollowAnotherProfile = async (req, res) => {
+    try {
+        const currentProfileId = req.user.id;
+        const anotherProfileId = req.body.profileId;
+
+        // for current user profile
+        await User.findOneAndUpdate(
+            {
+                _id: currentProfileId,
+            },
+            {
+                $pull: { followingList: anotherProfileId }
+            }
+        );
+
+
+        // for another user profile
+        await User.findOneAndUpdate(
+            { _id: anotherProfileId, followersCount: { $gt: 0 } },
+            { $inc: { followersCount: -1 } }
+        );
+
+        return res.status(200).json(
+            {
+                status: "SUCCESS",
+                message: "Profile unfollowed successfully"
+            }
+        );
+    }
+    catch (error) {
+        return res.status(500).json(
+            {
+                status: "FAILED",
+                message: "Failed to unfollow user",
+                error: error.message
+            }
+        );
+    }
+};
+
 
 module.exports = {
     getAllUsers,
     registerUser,
     loginUser,
     getUserById,
-    checkAuth
+    checkAuth,
+    saveBlog,
+    unsaveBlog,
+    getSavedBlogs,
+    followAnotherProfile,
+    unfollowAnotherProfile
 }

@@ -19,11 +19,11 @@ const blogSchema = new Schema({
         ref: "User",
         required: true
     },
-    tags: [{
-        type: String,
-        maxLength: 30
-    }],
-
+    tags: {
+        type: [String],
+        maxLength: 30,
+        default: []
+    },
     category: {
         type: String,
         enum: blogCategories,
@@ -32,6 +32,11 @@ const blogSchema = new Schema({
     blogImageUrl: {
         type: String,
         default: ""
+    },
+    likedByList: {
+        type: [Schema.Types.ObjectId],
+        ref: "User",
+        default: []
     },
     likesCount: {
         type: Number,

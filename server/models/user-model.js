@@ -2,13 +2,12 @@ const { Schema, model } = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-
 const userSchema = new Schema({
     username: {
         type: String,
         required: true,
-        maxLength: 50,
-        minLength: 3
+        minLength: 3,
+        maxLength: 50
     },
     email: {
         type: String,
@@ -30,6 +29,21 @@ const userSchema = new Schema({
         enum: ["Admin", "User"],
         required: true,
         default: "User"
+    },
+    savedBlogs: {
+        type: [Schema.Types.ObjectId],
+        ref: "Blog",
+        default: []
+    },
+    followingList: {
+        type: [Schema.Types.ObjectId],
+        ref: "User",
+        default: []
+    },
+    followersCount: {
+        type: Number,
+        default: 0,
+        min: 0
     }
 }, { timestamps: true });
 

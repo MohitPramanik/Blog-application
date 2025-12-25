@@ -1,5 +1,3 @@
-import type { SetStateAction } from "react";
-
 export type User = {
   userId: string;
   username: string;
@@ -22,7 +20,7 @@ export interface Blog {
   createdAt: string;
   likesCount?: number;
   commentsCount?: number;
-} 
+}
 
 export interface Comment {
   id: string;
@@ -57,4 +55,9 @@ export type AuthContextProps = {
 
 export type BlogContextProps = {
   children: React.ReactNode;
+}
+
+export type EditingCommentType = {
+  id: string;
+  text: string
 }

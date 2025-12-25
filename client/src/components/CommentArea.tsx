@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import CommentItem from './CommentItem';
 import { useAuth } from '../context/AuthContext';
+import CommentEditModal from './CommentEditModal';
+import type { EditingCommentType } from '../types';
 
 type CommentAreaProps = {
     blogId: string | undefined;
@@ -25,7 +27,8 @@ const CommentArea: React.FC<CommentAreaProps> = ({ blogId = "", increaseCommentC
     const [submittingComment, setSubmittingComment] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false)
     const [comments, setComments] = useState<Comment[]>([]);
-
+    const [editingComment, setEditingComment] = useState<EditingCommentType | null>(null)
+    const [openEditModal, setOpenEditModal] = useState<boolean>(false);
     const { user } = useAuth();
 
 
@@ -70,8 +73,24 @@ const CommentArea: React.FC<CommentAreaProps> = ({ blogId = "", increaseCommentC
         }
     }
 
-    const handleCommentLike = (id: string) => { }
-    const handleCommentDislike = (id: string) => { }
+    const handleCommentLike = async (id: string) => {
+        try {
+            await api.put(`/comment/${id}/like`);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleCommentDislike = async (id: string) => {
+        try {
+            await api.put(`/comment/${id}/dislike`);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
 
     const handleDeleteComment = async (commentId: string) => {
         try {
@@ -88,6 +107,29 @@ const CommentArea: React.FC<CommentAreaProps> = ({ blogId = "", increaseCommentC
         }
         finally {
             setLoading(true);
+        }
+    }
+
+    const handleUpdateComment = async (message: string) => {
+        try {
+            await api.put(`/comment/${editingComment?.id}`, {
+                content: message
+            })
+
+            toast.success("Comment updated successfully");
+            setOpenEditModal(false);
+
+            let modifiedComments = comments.map((comment) => {
+                return (comment._id === editingComment?.id) ?
+                    { ...comment, content: message } :
+                    comment
+            }); 
+
+            setComments(modifiedComments);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data.message);
+            }
         }
     }
 
@@ -154,6 +196,8 @@ const CommentArea: React.FC<CommentAreaProps> = ({ blogId = "", increaseCommentC
                                     onLike={() => handleCommentLike(comment._id)}
                                     onDislike={() => handleCommentDislike(comment._id)}
                                     handleDeleteComment={handleDeleteComment}
+                                    setOpenEditModal={setOpenEditModal}
+                                    setEditingComment={setEditingComment}
                                 />
                             ))
                         ) : (
@@ -165,6 +209,13 @@ const CommentArea: React.FC<CommentAreaProps> = ({ blogId = "", increaseCommentC
 
                 </Card.Body>
             </Card>
+
+            <CommentEditModal
+                editingComment={editingComment}
+                show={openEditModal}
+                onHide={() => setOpenEditModal(false)}
+                handleUpdateComment={handleUpdateComment}
+            />
         </>
 
     )

@@ -14,12 +14,17 @@ router.route("/user")
 
 
 router.route("/category")
-    .get(isLoggedIn, blogController.getBlogCategories) // get all blog categories
+    .get(isLoggedIn, blogController.getBlogCategories); // get all blog categories
+
 
 router.route("/:id")
     .get(isLoggedIn, blogController.getIndividualBlog)  // get individual blog
     .put(isLoggedIn, blogController.updateBlog)  // update blog
     .delete(isLoggedIn, blogController.deleteBlog);  // delete blog
 
+
+router.route("/:id/like")
+    .post(isLoggedIn, blogController.likeBlog) // like a blog post
+    .delete(isLoggedIn, blogController.unlikeBlog); // unlike a blog post
 
 module.exports = router;

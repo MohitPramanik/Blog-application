@@ -17,15 +17,11 @@ const commentSchema = new Schema({
         minLength: 1,
         maxLength: 1000
     },
-    likes: {
-        type: Number,
-        default: 0
-    },
-    dislikes: {
-        type: Number,
-        default: 0
-    },
-
+    likedBy: {
+        type: [Schema.Types.ObjectId],
+        ref: "User",
+        default: []
+    }
 }, { timestamps: true });
 
 const Comment = model("Comment", commentSchema);

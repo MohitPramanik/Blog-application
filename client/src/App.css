@@ -35,6 +35,11 @@ button:disabled {
   pointer-events: all !important;
 }
 
+button, button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .fw-500 {
   font-weight: 500;
 }
