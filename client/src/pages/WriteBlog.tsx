@@ -24,7 +24,7 @@ const WriteBlog: React.FC = () => {
   });
 
   const [error, setError] = useState<string | null>(null);
-  const { blogCategories, getAllBlogsCategories } = useBlog();
+  const { blogCategories, getAllBlogsCategories, updateBlogCategoryCount } = useBlog();
 
   useEffect(() => {
     getAllBlogsCategories();
@@ -40,6 +40,7 @@ const WriteBlog: React.FC = () => {
     try {
       let response = await api.post("/blog", formData);
       toast.success(response.data.message);
+      updateBlogCategoryCount(formData.category, "created");
       navigate("/blogs");
     }
     catch (error) {
@@ -56,10 +57,6 @@ const WriteBlog: React.FC = () => {
       };
     });
   }
-
-  // const handleContentChange = (value: string) => {
-  //   setFormData(prev => ({ ...prev, content: value }));
-  // };
 
   return (
     <Container className="py-5">
@@ -81,11 +78,11 @@ const WriteBlog: React.FC = () => {
 
         <Form.Group className="mb-3">
           <Form.Label>Category</Form.Label>
-          <Form.Select aria-label="Default select example" onChange={handleChange} name='category' value={formData.category}>
+          <Form.Select aria-label="Default select example" onChange={handleChange} name='category'>
               <option>Select</option>
               {
                 blogCategories.map((category) => (
-                  <option key={category} value={category}>{category}</option>
+                  <option key={category?._id} value={category._id}>{category.name}</option>
                 ))
               }
           </Form.Select>

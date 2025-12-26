@@ -14,19 +14,20 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { FaComment } from "react-icons/fa";
 import CommentArea from '../components/CommentArea';
+import { useBlog } from '../context/BlogContext';
 
 type BlogDetailProps = {
-  blog: Blog | null;
+  blog: Blog;
   setBlog: React.Dispatch<React.SetStateAction<Blog | null>>;
   onEdit: () => void;
 };
 
 const BlogDetail: React.FC<BlogDetailProps> = ({ blog, setBlog, onEdit }) => {
   const { id } = useParams<{ id: string }>();
-  // const [blog, setBlog] = useState<Blog | null>(null);
   const navigate = useNavigate();
   const [commentCount, setCommentCount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const {updateBlogCategoryCount} = useBlog();
 
   const [userActions, setUserActions] = useState({
     saved: false,
@@ -75,6 +76,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blog, setBlog, onEdit }) => {
     try {
       let response = await api.delete(`blog/${id}`);
       toast.success(response.data.message);
+      updateBlogCategoryCount(blog?.category?._id, "deleted")
       setTimeout(() => {
         navigate("/blogs");
       }, 500)
@@ -235,7 +237,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blog, setBlog, onEdit }) => {
 
                   {/* menu to display only if owned by logged in user */}
                   {
-                    blog.author._id === user?.userId ? (
+                    blog?.author?._id === user?.userId ? (
                       <Dropdown>
                         <Dropdown.Toggle className='blog-update-toggle-menu'>
                           <BsThreeDotsVertical />
@@ -253,8 +255,8 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blog, setBlog, onEdit }) => {
 
                 <div className="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
                   <Image
-                    src={blog.author?.profileImageUrl || profileImagePlaceholder}
-                    alt={blog.author?.username || "profile image"}
+                    src={blog?.author?.profileImageUrl || profileImagePlaceholder}
+                    alt={blog?.author?.username || "profile image"}
                     roundedCircle
                     width={48}
                     height={48}

@@ -25,9 +25,10 @@ const blogSchema = new Schema({
         default: []
     },
     category: {
-        type: String,
-        enum: blogCategories,
-        required: true
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
+        required: true,
+        index: true
     },
     blogImageUrl: {
         type: String,

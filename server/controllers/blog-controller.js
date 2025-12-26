@@ -1,8 +1,8 @@
-const mongoose = require("mongoose");
 const Blog = require("../models/blog-model");
 const Comment = require("../models/comment-model");
 const User = require("../models/user-model");
-const { blogCategories } = require("../utils/constants");
+const Category = require("../models/category-model");
+const mongoose = require("mongoose");
 
 const getAllBlogs = async (req, res) => {
 
@@ -11,7 +11,7 @@ const getAllBlogs = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const search = req.query?.search?.trim();
-    const category = req.query?.category?.trim();
+    const categoryId = req.query?.categoryId?.trim();
     let filter = {};
 
     try {
@@ -26,14 +26,14 @@ const getAllBlogs = async (req, res) => {
                 ]
             }
         }
-        else if (category) {
-            filter = { category: { $regex: category, $options: "i" } };
+        else if (categoryId) {
+            filter = { category: categoryId };
         }
 
         const blogs = await Blog.find(filter)
             .skip(skip)
             .limit(limit)
-            .populate("author", "username _id profileImageUrl")
+            .populate("author category", "username _id profileImageUrl name")
             .sort({ createdAt: -1 })
             .lean();
         const totalBlogs = await Blog.countDocuments(filter);
@@ -86,12 +86,24 @@ const getIndividualBlog = async (req, res) => {
 
 
 const createNewBlog = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
-        const { title, content, tags, blogImageUrl, category } = req.body;
+        const { title, content, category } = req.body;
         const user = await User.findById(req.user.id);
-        const newBlog = await Blog.create({
+        const newBlog = new Blog({
             title, content, author: user, category
-        })
+        });
+
+        await newBlog.save({ session });
+
+        await Category.findByIdAndUpdate(category, {
+            $inc: { categoryCount: 1 }
+        }, { session });
+
+        await session.commitTransaction();
+        session.endSession();
 
         return res.status(201).json({
             status: "SUCCESS",
@@ -100,16 +112,20 @@ const createNewBlog = async (req, res) => {
         });
     }
     catch (err) {
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({ message: "Server Error", error: err.message });
     }
 }
 
 
 const updateBlog = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
         const blogId = req.params.id;
         const authorId = req.user.id;
-        const { title, content, category } = req.body;
+        const { title, content, categoryId } = req.body;
 
         const updatedBlog = await Blog.findByIdAndUpdate(
             {
@@ -117,17 +133,28 @@ const updateBlog = async (req, res) => {
                 author: authorId
             },
             {
-                $set: { title, content, category }
+                $set: { title, content, category: categoryId }
             },
             {
-                new: true,
+                session,
                 runValidators: true
             }
         );
 
         if (!updatedBlog) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({ message: "Blog Not Found or you are not authorized" });
         }
+
+
+        if (updateBlog.category !== categoryId) {
+            await Category.findOneAndUpdate({ _id: updatedBlog.category, categoryCount: { $gt: 0 } }, { $inc: { categoryCount: -1 } }, { session });
+            await Category.findOneAndUpdate({ _id: categoryId, }, { $inc: { categoryCount: 1 } }, { session });
+        }
+
+        await session.commitTransaction();
+        session.endSession();
 
         return res.status(200).json({
             status: "SUCCESS",
@@ -135,6 +162,8 @@ const updateBlog = async (req, res) => {
         })
     }
     catch (err) {
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json(
             {
                 status: "FAILED",
@@ -147,6 +176,9 @@ const updateBlog = async (req, res) => {
 
 
 const deleteBlog = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
         const blogId = req.params.id;
         const authorId = req.user.id;
@@ -155,15 +187,25 @@ const deleteBlog = async (req, res) => {
             {
                 _id: blogId,
                 author: authorId
-            }
+            },
+            { session }
         )
 
         if (!deletedBlog) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({ message: "Blog Not Found or you are not authorized" });
         }
 
         // Deleting all the comments of the blog as well when then blog is deleted
-        await Comment.deleteMany({ relatedBlog: deletedBlog._id });
+        await Comment.deleteMany({ relatedBlog: deletedBlog._id }, { session });
+
+        await Category.findByIdAndUpdate(deletedBlog.category, {
+            $inc: { categoryCount: -1 }
+        }, { session });
+
+        await session.commitTransaction();
+        session.endSession();
 
         return res.status(200).json({
             status: "SUCCESS",
@@ -171,6 +213,8 @@ const deleteBlog = async (req, res) => {
         });
     }
     catch (err) {
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json(
             {
                 status: "FAILED",
@@ -179,14 +223,6 @@ const deleteBlog = async (req, res) => {
             }
         );
     }
-}
-
-
-const getBlogCategories = (req, res) => {
-    return res.status(200).json({
-        status: "SUCCESS",
-        data: blogCategories
-    })
 }
 
 
@@ -238,9 +274,6 @@ const likeBlog = async (req, res) => {
             return res.status(400).json({ message: "You have already liked this blog" });
         }
 
-        console.log(updatedBlog)
-
-
         return res.status(200).json({
             status: "SUCCESS",
             message: "Blog post liked successfully"
@@ -279,8 +312,6 @@ const unlikeBlog = async (req, res) => {
             return res.status(400).json({ message: "Blog is not liked yet" })
         }
 
-        console.log("Unlike blog", blog);
-
         return res.status(200).json({
             status: "SUCCESS",
             message: "Blog unliked successfully"
@@ -301,7 +332,6 @@ module.exports = {
     createNewBlog,
     updateBlog,
     deleteBlog,
-    getBlogCategories,
     getUserBlogs,
     likeBlog,
     unlikeBlog

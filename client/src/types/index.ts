@@ -11,7 +11,7 @@ export interface Blog {
   _id?: string;
   title: string;
   content: string;
-  category: string;
+  category: BlogCategoryType;
   author: {
     _id?: string;
     username: string;
@@ -36,6 +36,7 @@ export interface Comment {
 export type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
   login: (username: string, email: string) => void;
   signup: (username: string, email: string, password: string) => void;
   loading: boolean;
@@ -43,10 +44,17 @@ export type AuthContextType = {
   isAuthchecked: boolean;
 }
 
+export type BlogCategoryType = {
+  _id: string;
+  name: string;
+  categoryCount: number
+}
+
 export type BlogContextType = {
-  blogCategories: [];
+blogCategories: BlogCategoryType[];
   getAllBlogsCategories: () => void;
   loading: boolean;
+  updateBlogCategoryCount: (categoryId: string, action: "created" | "deleted") => void;
 }
 
 export type AuthContextProps = {

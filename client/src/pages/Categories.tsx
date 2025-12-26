@@ -30,8 +30,8 @@ const Categories: React.FC = () => {
             {blogCategories.length > 0 ? (
               <Row className="g-4 mb-4">
                 {blogCategories.map((category) => (
-                  <Col key={category} xs={12} sm={6} md={4} lg={3}>
-                    <Link to={category}>
+                  <Col key={category._id} xs={12} sm={6} md={4} lg={3}>
+                    <Link to={category.name} state={{ categoryId: category._id }} >
                       <BlogCategoryCard category={category} />
                     </Link>
                   </Col>

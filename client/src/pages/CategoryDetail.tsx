@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import BlogCard from '../components/BlogCard';
 import type { Blog } from '../types';
 import '../styles/BlogList.css';
@@ -15,10 +15,13 @@ const CategoryDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const { categoryId } = location.state as { categoryId: string };
+
   const getBlogsByCategory = async () => {
     try {
       setLoading(true);
-      let response = await api.get(`/blog?category=${category}`);
+      let response = await api.get(`/blog?categoryId=${categoryId}`);
       setBlogs(response.data.data);
     }
     catch (error) {

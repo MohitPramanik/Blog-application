@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const User = require("../models/user-model");
 const bcrypt = require("bcrypt");
 
+
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.find({});
@@ -26,7 +27,7 @@ const registerUser = async (req, res) => {
     try {
         const { username, email, password, profileImageUrl, dob, role } = req.body;
 
-        const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({ email }).lean();
 
         if (userExists) {
             return res.status(400).json({
@@ -51,6 +52,7 @@ const registerUser = async (req, res) => {
         });
     }
 }
+
 
 const loginUser = async (req, res) => {
     try {
@@ -93,6 +95,7 @@ const loginUser = async (req, res) => {
     }
 }
 
+
 const getUserById = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -114,6 +117,7 @@ const getUserById = async (req, res) => {
     }
 }
 
+
 const checkAuth = async (req, res) => {
 
     let user = await User.findById(req.user.id).select({ password: 0 });
@@ -123,6 +127,7 @@ const checkAuth = async (req, res) => {
         user: user
     });
 };
+
 
 const saveBlog = async (req, res) => {
     const { blogId } = req.params;
@@ -146,6 +151,7 @@ const saveBlog = async (req, res) => {
         })
     }
 }
+
 
 const unsaveBlog = async (req, res) => {
     const { blogId } = req.params;
@@ -205,6 +211,8 @@ const getSavedBlogs = async (req, res) => {
 
 
 const followAnotherProfile = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
         const currentProfileId = req.user.id;
         const anotherProfileId = req.body.profileId;
@@ -234,17 +242,24 @@ const followAnotherProfile = async (req, res) => {
             );
         }
 
+
+
         // Perform for current user
         await User.findByIdAndUpdate(
             currentProfileId,
-            { $addToSet: { followingList: anotherProfileId } }
+            { $addToSet: { followingList: anotherProfileId } },
+            { session }
         );
 
         // for another profile user
         await User.findByIdAndUpdate(
             anotherProfileId,
-            { $inc: { followersCount: 1 } }
+            { $inc: { followersCount: 1 } },
+            { session }
         );
+
+        await session.commitTransaction();
+        session.endSession();
 
         return res.status(200).json(
             {
@@ -254,6 +269,9 @@ const followAnotherProfile = async (req, res) => {
         );
     }
     catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+
         return res.status(500).json(
             {
                 status: "FAILED",
@@ -264,7 +282,11 @@ const followAnotherProfile = async (req, res) => {
     }
 };
 
+
 const unfollowAnotherProfile = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
         const currentProfileId = req.user.id;
         const anotherProfileId = req.body.profileId;
@@ -276,15 +298,20 @@ const unfollowAnotherProfile = async (req, res) => {
             },
             {
                 $pull: { followingList: anotherProfileId }
-            }
+            },
+            { session }
         );
 
 
         // for another user profile
         await User.findOneAndUpdate(
             { _id: anotherProfileId, followersCount: { $gt: 0 } },
-            { $inc: { followersCount: -1 } }
+            { $inc: { followersCount: -1 } },
+            { session }
         );
+
+        await session.commitTransaction();
+        session.endSession();
 
         return res.status(200).json(
             {
@@ -294,6 +321,8 @@ const unfollowAnotherProfile = async (req, res) => {
         );
     }
     catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json(
             {
                 status: "FAILED",
@@ -305,6 +334,56 @@ const unfollowAnotherProfile = async (req, res) => {
 };
 
 
+const updateProfile = async (req, res) => {
+    try {
+        const { username, dob } = req.body;
+        const userId = req.user.id;
+
+        let updateFields = {
+            username,
+            dob
+        }
+
+        if (req.file) {
+            updateFields = {
+                username,
+                dob,
+                profileImageUrl: req.file.path
+            }
+        }
+
+        let user = await User.findByIdAndUpdate(userId, updateFields, { runValidators: true });
+
+        if (!user) {
+            return res.status(400).json({
+                status: "FAILED",
+                message: "Failed to update profile"
+            })
+        }
+
+        if (req.file) {
+            return res.status(200).json({
+                status: "SUCCESS",
+                message: "Profile updated successfully",
+                profileUrl: req?.file?.path
+            })
+        }
+        else {
+            return res.status(200).json({
+                status: "SUCCESS",
+                message: "Profile updated successfully",
+            })
+        }
+
+    } catch (error) {
+        return res.status(500).json({
+            status: "FAILED",
+            message: "Failed to update profile",
+            error: error.message
+        })
+    }
+}
+
 module.exports = {
     getAllUsers,
     registerUser,
@@ -315,5 +394,6 @@ module.exports = {
     unsaveBlog,
     getSavedBlogs,
     followAnotherProfile,
-    unfollowAnotherProfile
+    unfollowAnotherProfile,
+    updateProfile
 }

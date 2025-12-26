@@ -13,10 +13,6 @@ router.route("/user")
     .get(isLoggedIn, blogController.getUserBlogs); // get logged in user blogs
 
 
-router.route("/category")
-    .get(isLoggedIn, blogController.getBlogCategories); // get all blog categories
-
-
 router.route("/:id")
     .get(isLoggedIn, blogController.getIndividualBlog)  // get individual blog
     .put(isLoggedIn, blogController.updateBlog)  // update blog

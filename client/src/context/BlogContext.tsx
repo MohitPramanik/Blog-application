@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import type { BlogContextProps, BlogContextType } from "../types/index";
+import type { Blog, BlogCategoryType, BlogContextProps, BlogContextType } from "../types/index";
 import api from "../api/axiosInstance";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -17,13 +17,14 @@ export const useBlog = () => {
 
 const BlogContextProvider: React.FC<BlogContextProps> = ({ children }) => {
 
-    const [blogCategories, setBlogCategories] = useState<[]>([]);
+    const [blogCategories, setBlogCategories] = useState<BlogCategoryType[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
     const getAllBlogsCategories = async () => {
         try {
             if (!blogCategories.length) {
-                let response = await api.get("/blog/category");
+                setLoading(true);
+                let response = await api.get("/category");
                 setBlogCategories(response.data.data);
             }
         } catch (error) {
@@ -32,10 +33,30 @@ const BlogContextProvider: React.FC<BlogContextProps> = ({ children }) => {
             }
             console.log(error);
         }
+        finally {
+            setLoading(false);
+        }
     }
 
+    const updateBlogCategoryCount = (categoryId: string, action: "created" | "deleted") => {
+        setBlogCategories((prevCategories) =>
+            prevCategories.map((category) =>
+                category._id === categoryId
+                    ? {
+                        ...category,
+                        categoryCount:
+                            action === "created"
+                                ? category.categoryCount + 1
+                                : (category.categoryCount > 0 ? category.categoryCount - 1 : category.categoryCount) ,
+                    }
+                    : category
+            )
+        );
+    };
+
+
     return (
-        <BlogContext.Provider value={{ blogCategories, getAllBlogsCategories, loading }}>
+        <BlogContext.Provider value={{ blogCategories, getAllBlogsCategories, loading, updateBlogCategoryCount }}>
             {children}
         </BlogContext.Provider>
     )

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import api from '../api/axiosInstance';
-import type { Blog } from '../types';
+import type { Blog, BlogCategoryType } from '../types';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useBlog } from '../context/BlogContext';
 
 type EditBlogProps = {
     blog: Blog | null;
@@ -13,19 +14,31 @@ type EditBlogProps = {
     onSuccess: () => void;
 };
 
+type formDataType = {
+    title: string;
+    content: string;
+    categoryId: string | BlogCategoryType;
+}
+
 const EditBlog: React.FC<EditBlogProps> = ({
     blog,
     setBlog,
     onCancel,
     onSuccess
 }) => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<formDataType>({
         title: blog?.title || "",
         content: blog?.content || "",
-        category: blog?.category || ""
+        categoryId: blog?.category || ""
     });
 
     const { id: blogId } = useParams();
+
+    const { blogCategories, getAllBlogsCategories, updateBlogCategoryCount } = useBlog();
+
+    useEffect(() => {
+        getAllBlogsCategories();
+    }, [])
 
 
     const handleChange = (
@@ -40,7 +53,7 @@ const EditBlog: React.FC<EditBlogProps> = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.title || !formData.content || !formData.category) {
+        if (!formData.title || !formData.content || !formData.categoryId) {
             toast.error("All fields are required");
             return;
         }
@@ -50,6 +63,15 @@ const EditBlog: React.FC<EditBlogProps> = ({
 
             setBlog(response.data.data);
             toast.success('Blog updated successfully');
+
+            if (blog?.category !== formData.categoryId) {
+                console.log("Blog category", blog?.category);
+                console.log("formdata category", formData.categoryId);
+                updateBlogCategoryCount(String(formData?.categoryId), "created");
+                updateBlogCategoryCount(String(blog?.category), "deleted");
+            }
+
+
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 toast.error(error.response?.data.message);
@@ -86,11 +108,14 @@ const EditBlog: React.FC<EditBlogProps> = ({
 
                 <Form.Group className="mb-3">
                     <Form.Label>Category</Form.Label>
-                    <Form.Control
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                    />
+                    <Form.Select aria-label="Default select example" onChange={handleChange} name='categoryId' value={formData?.categoryId.toString()}>
+                        <option>Select</option>
+                        {
+                            blogCategories.map((category) => (
+                                <option key={category?._id} value={category._id}>{category.name}</option>
+                            ))
+                        }
+                    </Form.Select>
                 </Form.Group>
 
                 <div className="d-flex gap-2">

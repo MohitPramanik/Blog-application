@@ -126,7 +126,7 @@ const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAuthenticated, login, signup, logout, isAuthchecked }}>
+    <AuthContext.Provider value={{ user, setUser, loading, isAuthenticated, login, signup, logout, isAuthchecked }}>
       {children}
     </AuthContext.Provider>
   )

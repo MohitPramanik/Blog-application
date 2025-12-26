@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Comment = require('../models/comment-model');
 const Blog = require("../models/blog-model");
 
@@ -11,16 +12,16 @@ const getAllComments = async (req, res) => {
         const userId = req.user.id; // required for mapping isLiked variable with the comment for logged in user
 
         const comments = await Comment.find({ blog: blogId })
-                                      .skip(skip)
-                                      .limit(limit)
-                                      .sort({ createdAt: -1 })
-                                      .populate("author", "username profileImageUrl")
-                                      .lean();
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 })
+            .populate("author", "username profileImageUrl")
+            .lean();
         const totalComments = await Comment.countDocuments({ blog: blogId });
 
         const mappedComments = comments.map((comment) => {
             return {
-                ...comment, 
+                ...comment,
                 isLiked: comment?.likedBy?.some(id => id.toString() === userId),
                 likedCount: comment?.likedBy?.length
             }
@@ -38,6 +39,9 @@ const getAllComments = async (req, res) => {
 }
 
 const createNewComment = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
         const { id: blogId } = req.params;
         const { content } = req.body;
@@ -46,21 +50,29 @@ const createNewComment = async (req, res) => {
         const updatedBlog = await Blog.findByIdAndUpdate(
             { _id: blogId },
             { $inc: { commentsCount: 1 } },
-            { new: true, runValidators: true }
+            { new: true, runValidators: true, session }
         );
 
         if (!updatedBlog) {
+            await session.abortTransaction();
+            session.endSession();
+
             return res.status(404).json({
                 status: "ERROR",
                 message: "Blog not found"
             })
         }
 
-        const newComment = await Comment.create({
+        const newComment = new Comment({
             blog: updatedBlog,
             content: content,
             author: req.user.id
         });
+
+        await newComment.save({ session })
+
+        await session.commitTransaction();
+        session.endSession();
 
         return res.status(201).json({
             status: "SUCCESS",
@@ -68,6 +80,8 @@ const createNewComment = async (req, res) => {
             data: newComment._id
         });
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({ message: "Server Error", error: error.message });
     }
 }
@@ -112,6 +126,9 @@ const updateComment = async (req, res) => {
 }
 
 const deleteComment = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
         const commentId = req.params.id;
         const authorId = req.user.id;
@@ -120,18 +137,25 @@ const deleteComment = async (req, res) => {
             {
                 _id: commentId,
                 author: authorId
-            }
+            },
+            { session }
         );
 
         if (!deletedComment) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({ message: "Comment Not Found or you are not authorized" });
         }
 
         // Decrement comment count from blog if the comment is deleted
         await Blog.findOneAndUpdate(
             { _id: deletedComment.blog, commentsCount: { $gt: 0 } },
-            { $inc: { commentsCount: -1 } }
+            { $inc: { commentsCount: -1 } },
+            { session }
         );
+
+        await session.commitTransaction();
+        session.endSession();
 
         return res.status(200).json({
             status: "SUCCESS",
@@ -140,6 +164,9 @@ const deleteComment = async (req, res) => {
 
     }
     catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        
         return res.status(500).json(
             {
                 status: "FAILED",
