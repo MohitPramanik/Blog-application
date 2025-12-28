@@ -22,6 +22,10 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/", (req, res) => {
+    return res.send("Hello world");
+})
+
 app.use("/api/user", userRouter);
 app.use("/api/blog", blogRouter);
 app.use("/api/comment", commentRouter);
