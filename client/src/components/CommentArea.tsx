@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { Button, Card, Form, Spinner } from 'react-bootstrap'
 import api from '../api/axiosInstance';
 import { toast } from 'react-toastify';
@@ -110,7 +110,7 @@ const CommentArea: React.FC<CommentAreaProps> = ({ blogId = "", increaseCommentC
         }
     }
 
-    const handleUpdateComment = async (message: string) => {
+    const handleUpdateComment = useCallback(() => async (message: string) => {
         try {
             await api.put(`/comment/${editingComment?.id}`, {
                 content: message
@@ -131,7 +131,11 @@ const CommentArea: React.FC<CommentAreaProps> = ({ blogId = "", increaseCommentC
                 toast.error(error.response?.data.message);
             }
         }
-    }
+    }, [])
+
+    const handleHideEditModal = useCallback(() => {
+        setOpenEditModal(false);
+    }, [])
 
     useEffect(() => {
         fetchComments();
@@ -213,7 +217,7 @@ const CommentArea: React.FC<CommentAreaProps> = ({ blogId = "", increaseCommentC
             <CommentEditModal
                 editingComment={editingComment}
                 show={openEditModal}
-                onHide={() => setOpenEditModal(false)}
+                onHide={handleHideEditModal}
                 handleUpdateComment={handleUpdateComment}
             />
         </>
@@ -221,4 +225,4 @@ const CommentArea: React.FC<CommentAreaProps> = ({ blogId = "", increaseCommentC
     )
 }
 
-export default CommentArea
+export default memo(CommentArea);

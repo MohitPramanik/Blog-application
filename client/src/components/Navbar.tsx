@@ -13,7 +13,7 @@ import '../styles/Navbar.css';
 const NavBar: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { notifications, removeNotification, clearAll, notify } = useNotification();
+  const { notifications, removeNotification, clearAll } = useNotification();
   const navigate = useNavigate();
 
   return (
@@ -32,7 +32,7 @@ const NavBar: React.FC = () => {
                 <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
 
                 {/* Notifications Dropdown */}
-                <Dropdown align="end" className="me-1">
+                <Dropdown align="end" className="me-1 d-none">
                   <Dropdown.Toggle variant="light" id="notifications-toggle">
                     <FaBell className='fs-6' /> { /* simple badge */ }
                     {notifications.length > 0 && (
@@ -94,6 +94,7 @@ const NavBar: React.FC = () => {
                       width={28}
                       height={28}
                       alt="Avatar"
+                      loading='lazy'
                       className='object-fit-cover'
                     />
                   </Dropdown.Toggle>

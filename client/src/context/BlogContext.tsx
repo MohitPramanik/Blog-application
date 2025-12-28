@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import type { Blog, BlogCategoryType, BlogContextProps, BlogContextType } from "../types/index";
+import type { BlogCategoryType, BlogContextProps, BlogContextType } from "../types/index";
 import api from "../api/axiosInstance";
 import axios from "axios";
 import { toast } from "react-toastify";

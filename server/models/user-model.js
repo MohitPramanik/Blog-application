@@ -6,8 +6,8 @@ const userSchema = new Schema({
     username: {
         type: String,
         required: true,
-        minLength: 3,
-        maxLength: 50
+        minLength: [3, "Username should be of min 3 characters"],
+        maxLength: [50, "Username should not exceed 50 characters"]
     },
     email: {
         type: String,
@@ -30,11 +30,6 @@ const userSchema = new Schema({
         required: true,
         default: "User"
     },
-    savedBlogs: {
-        type: [Schema.Types.ObjectId],
-        ref: "Blog",
-        default: []
-    },
     followingList: {
         type: [Schema.Types.ObjectId],
         ref: "User",
@@ -55,7 +50,6 @@ userSchema.pre("save", async function () {
 
 userSchema.methods.generateToken = function (user) {
     const privateKey = process.env.SECRET_KEY;
-    console.log(privateKey)
 
     return jwt.sign({
         id: user._id,

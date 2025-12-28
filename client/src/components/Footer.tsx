@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import '../styles/Footer.css';
@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
           <Col md={6} className="text-center text-md-start mb-2 mb-md-0">
             <small>© {year} Blogging App. All rights reserved.</small>
           </Col>
-          <Col md={6} className="text-center text-md-end">
+          <Col md={6} className="text-center text-md-end d-flex justify-content-end align-items-center">
             <div className="d-inline-flex align-items-center me-3 social-icons">
               <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="social-icon me-3">
                 {/* LinkedIn SVG */}
@@ -51,4 +51,4 @@ const Footer: React.FC = () => {
   );
 };
 
-export default Footer;
+export default memo(Footer);

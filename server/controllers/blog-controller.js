@@ -1,8 +1,8 @@
+const mongoose = require("mongoose");
 const Blog = require("../models/blog-model");
-const Comment = require("../models/comment-model");
 const User = require("../models/user-model");
 const Category = require("../models/category-model");
-const mongoose = require("mongoose");
+const SavedBlog = require("../models/savedBlog-model");
 
 const getAllBlogs = async (req, res) => {
 
@@ -12,7 +12,7 @@ const getAllBlogs = async (req, res) => {
 
     const search = req.query?.search?.trim();
     const categoryId = req.query?.categoryId?.trim();
-    let filter = {};
+    let filter = { isDeleted: false };
 
     try {
         if (search) {
@@ -20,14 +20,19 @@ const getAllBlogs = async (req, res) => {
             const authorIds = users.map(user => user._id);
 
             filter = {
-                $or: [
-                    { title: { $regex: search, $options: "i" } },
-                    { author: { $in: authorIds } },
+                $and: [
+                    { isDeleted: false },
+                    {
+                        $or: [
+                            { title: { $regex: search, $options: "i" } },
+                            { author: { $in: authorIds } }
+                        ]
+                    }
                 ]
             }
         }
         else if (categoryId) {
-            filter = { category: categoryId };
+            filter = { category: categoryId, isDeleted: false };
         }
 
         const blogs = await Blog.find(filter)
@@ -55,28 +60,35 @@ const getIndividualBlog = async (req, res) => {
         const userId = req.user.id;
         const blogId = req.params.id;
         const blog =
-            await Blog.findById(blogId)
+            await Blog.findOne({ _id: blogId, isDeleted: false })
                 .populate("author", "username email profileImageUrl")
                 .lean();
 
+        if (!blog) {
+            return res.status(500).json({
+                status: "FAILED",
+                message: "Blog does not exist"
+            })
+        }
 
         // Checking if logged in user has saved the blog or not
-        const user =
-            await User.findById(userId)
-                .select({ savedBlogs: 1, followingList: 1 })
+        const savedBlog =
+            await SavedBlog.findOne({ blogId, userId, isDeleted: false })
                 .lean();
 
+        const user = await User.findById(userId).lean();
 
-        const modifiedBlog = {
+
+        const responseData = {
             ...blog,
-            isSaved: user?.savedBlogs?.some(id => id.toString() === blogId),
+            isSaved: savedBlog ? true : false,
             isFollowingAuthor: user?.followingList?.some(id => id.toString() === blog.author._id.toString()),
             isLiked: blog?.likedByList?.some(id => id.toString() === user._id.toString())
         }
 
         return res.status(200).json({
             status: "SUCCESS",
-            data: modifiedBlog
+            data: responseData
         });
     }
     catch (err) {
@@ -127,10 +139,11 @@ const updateBlog = async (req, res) => {
         const authorId = req.user.id;
         const { title, content, categoryId } = req.body;
 
-        const updatedBlog = await Blog.findByIdAndUpdate(
+        const updatedBlog = await Blog.findOneAndUpdate(
             {
                 _id: blogId,
-                author: authorId
+                author: authorId,
+                isDeleted: false
             },
             {
                 $set: { title, content, category: categoryId }
@@ -183,10 +196,15 @@ const deleteBlog = async (req, res) => {
         const blogId = req.params.id;
         const authorId = req.user.id;
 
-        const deletedBlog = await Blog.findOneAndDelete(
+        // soft delete
+        const deletedBlog = await Blog.findOneAndUpdate(
             {
                 _id: blogId,
-                author: authorId
+                author: authorId,
+                isDeleted: false
+            },
+            {
+                isDeleted: true
             },
             { session }
         )
@@ -198,7 +216,11 @@ const deleteBlog = async (req, res) => {
         }
 
         // Deleting all the comments of the blog as well when then blog is deleted
-        await Comment.deleteMany({ relatedBlog: deletedBlog._id }, { session });
+        // await Comment.deleteMany({ relatedBlog: deletedBlog._id }, { session });
+
+        // await User.find (req.user.id, { $pull: { savedBlogs: blogId } }, { session });
+
+        await SavedBlog.findOneAndUpdate({ blogId }, { isDeleted: true }, { session });
 
         await Category.findByIdAndUpdate(deletedBlog.category, {
             $inc: { categoryCount: -1 }
@@ -225,6 +247,61 @@ const deleteBlog = async (req, res) => {
     }
 }
 
+const recoverDeleteBlog = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const blogId = req.params.id;
+        const authorId = req.user.id;
+
+        // soft delete
+        const deletedBlog = await Blog.findOneAndUpdate(
+            {
+                _id: blogId,
+                author: authorId
+            },
+            {
+                isDeleted: false
+            },
+            { session }
+        )
+
+        if (!deletedBlog) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(404).json({ message: "Blog Not Found or you are not authorized" });
+        }
+
+
+        await SavedBlog.findOneAndUpdate({ blogId }, { isDeleted: false }, { session });
+        // await User.find (req.user.id, { $pull: { savedBlogs: blogId } }, { session });
+
+        await Category.findByIdAndUpdate(deletedBlog.category, {
+            $inc: { categoryCount: 1 }
+        }, { session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return res.status(200).json({
+            status: "SUCCESS",
+            message: "Blog Recovered Successfully",
+        });
+    }
+    catch (err) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json(
+            {
+                status: "FAILED",
+                message: "Failed to recover the blog",
+                error: err.message
+            }
+        );
+    }
+}
+
 
 const getUserBlogs = async (req, res) => {
     const userId = req.user.id;
@@ -233,7 +310,7 @@ const getUserBlogs = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const filter = { author: userId };
+    const filter = { author: userId, isDeleted: false };
 
     try {
         const blogs = await Blog.find(filter)
@@ -262,7 +339,8 @@ const likeBlog = async (req, res) => {
         const updatedBlog = await Blog.findOneAndUpdate(
             {
                 _id: blogId,
-                likedByList: { $ne: currentUserId } // Only update if user hasn't liked it
+                likedByList: { $ne: currentUserId }, // Only update if user hasn't liked it,
+                isDeleted: false
             },
             {
                 $addToSet: { likedByList: currentUserId },
@@ -297,7 +375,8 @@ const unlikeBlog = async (req, res) => {
         const blog = await Blog.findOneAndUpdate(
             {
                 _id: blogId,
-                likedByList: userId
+                likedByList: userId,
+                isDeleted: false
             },
             {
                 $pull: { likedByList: userId },
@@ -334,5 +413,6 @@ module.exports = {
     deleteBlog,
     getUserBlogs,
     likeBlog,
-    unlikeBlog
+    unlikeBlog,
+    recoverDeleteBlog
 }

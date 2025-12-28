@@ -1,26 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import axios from 'axios';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import BlogCard from '../components/BlogCard';
 import type { Blog } from '../types';
-import '../styles/BlogList.css';
 import Loader from '../components/Loader';
 import api from '../api/axiosInstance';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import { PAGE_SIZE } from "../constants/constant";
+import SearchBox from '../components/SearchBox';
+import '../styles/BlogList.css';
+
+const BlogCard = React.lazy(() => import('../components/BlogCard'));
+const PaginationBtns = React.lazy(() => import('../components/PaginationBtns'));
 
 const BlogList: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [searchText, setSearchText] = useState<string>('');
+
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [totalBlogCount, setTotalBlogCount] = useState<number>(0);
 
 
-  const fetchBlogs = async () => {
+  const fetchBlogs = async (page = 1, limit = PAGE_SIZE || 12) => {
     try {
-      let response = await api.get("/blog");
+      let response = await api.get(`blog?page=${page}&limit=${limit}`);
       setBlogs(response.data.data);
+      setTotalBlogCount(response.data.total_records_count);
     }
     catch (error) {
       console.log(error);
@@ -35,12 +41,16 @@ const BlogList: React.FC = () => {
     }, 500)
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-  };
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "instant"
+    })
+  }, [fetchBlogs])
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+
+
+  const handleSearch = async (searchText:string) => {
     try {
       setLoading(true);
 
@@ -88,20 +98,10 @@ const BlogList: React.FC = () => {
 
         <Row className="mb-4">
           <Col md={8}>
-            <InputGroup as={"form"} onSubmit={handleSearch} className="search-input">
-              <InputGroup.Text as={"button"} className="bg-white border-end-0">
-                🔍
-              </InputGroup.Text>
-              <Form.Control
-                placeholder="Search blogs by title, content, or author..."
-                value={searchText}
-                onChange={handleChange}
-                className="border-start-0"
-              />
-            </InputGroup>
+            <SearchBox handleSearch={handleSearch} />
           </Col>
           <Col md={4} className="text-end d-flex align-items-center justify-content-md-end mt-3 mt-md-0">
-            <Button variant="primary" className="w-100 w-md-auto" onClick={() => navigate('/write')}>
+            <Button variant="primary" className="w-100 w-md-auto primary-btn" onClick={() => navigate('/write')}>
               ✍️ Write Blog
             </Button>
           </Col>
@@ -123,7 +123,7 @@ const BlogList: React.FC = () => {
               <div className="text-center py-5">
                 <h3 className="text-muted">No blogs found</h3>
                 <p className="text-muted">
-                  {searchText
+                  {!!searchParams.size
                     ? 'Try searching with different keywords'
                     : 'No blogs available at the moment'}
                 </p>
@@ -132,6 +132,8 @@ const BlogList: React.FC = () => {
           </>
         )}
       </Container>
+
+      <PaginationBtns fetchBlogs={fetchBlogs} totalCount={totalBlogCount} />
     </div>
   );
 };

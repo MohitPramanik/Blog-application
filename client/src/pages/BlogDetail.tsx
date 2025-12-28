@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Button, Image, Spinner, Alert, Dropdown } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -17,7 +17,7 @@ import CommentArea from '../components/CommentArea';
 import { useBlog } from '../context/BlogContext';
 
 type BlogDetailProps = {
-  blog: Blog;
+  blog: Blog | null;
   setBlog: React.Dispatch<React.SetStateAction<Blog | null>>;
   onEdit: () => void;
 };
@@ -76,7 +76,8 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blog, setBlog, onEdit }) => {
     try {
       let response = await api.delete(`blog/${id}`);
       toast.success(response.data.message);
-      updateBlogCategoryCount(blog?.category?._id, "deleted")
+      updateBlogCategoryCount(blog?.category || "", "deleted")
+
       setTimeout(() => {
         navigate("/blogs");
       }, 500)
@@ -90,17 +91,17 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blog, setBlog, onEdit }) => {
     }
   }
 
-  const increaseCommentCount = () => {
+  const increaseCommentCount = useCallback(() => {
     setCommentCount((prev) => prev + 1);
-  }
+  }, [])
 
-  const decreaseCommentCount = () => {
+  const decreaseCommentCount = useCallback(() => {
     setCommentCount((prev) => prev < 1 ? 0 : prev - 1);
-  }
+  }, [])
 
   const handleSaveBlog = async () => {
     try {
-      await api.post(`/user/saved-blogs/${id}`);
+      await api.post(`/saved-blogs/${id}`);
       setUserActions((prev) => ({
         ...prev,
         saved: true
@@ -115,7 +116,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blog, setBlog, onEdit }) => {
 
   const handleUnSaveBlog = async () => {
     try {
-      await api.delete(`/user/saved-blogs/${id}`);
+      await api.delete(`/saved-blogs/${id}`);
       setUserActions((prev) => ({
         ...prev,
         saved: false

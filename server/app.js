@@ -8,6 +8,7 @@ const userRouter = require("./routes/user-routes");
 const blogRouter = require("./routes/blog-routes");
 const commentRouter = require("./routes/comment-routes");
 const categoryRouter = require("./routes/category-routes");
+const savedBlogRouter = require("./routes/savedBlog-routes");
 
 const { errorHandler } = require("./utils/ExpressError");
 
@@ -25,6 +26,7 @@ app.use("/api/user", userRouter);
 app.use("/api/blog", blogRouter);
 app.use("/api/comment", commentRouter);
 app.use("/api/category", categoryRouter);
+app.use("/api/saved-blogs", savedBlogRouter);
 
 app.use(errorHandler);
 

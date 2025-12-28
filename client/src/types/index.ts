@@ -11,7 +11,7 @@ export interface Blog {
   _id?: string;
   title: string;
   content: string;
-  category: BlogCategoryType;
+  category: string;
   author: {
     _id?: string;
     username: string;

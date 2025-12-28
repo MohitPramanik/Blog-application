@@ -1,22 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Spinner, Button } from 'react-bootstrap';
+import { Container, Row, Col, Spinner } from 'react-bootstrap';
 import BlogCard from '../components/BlogCard';
 import type { Blog } from '../types';
 import '../styles/BlogList.css';
 import api from '../api/axiosInstance';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { PAGE_SIZE } from "../constants/constant";
+import PaginationBtns from '../components/PaginationBtns';
 
 const SavedBlogs: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalBlogCount, setTotalBlogCount] = useState<number>(0);
 
-  const fetchSavedBlogs = async () => {
+  const fetchSavedBlogs = async (page = 1, limit = PAGE_SIZE || 12) => {
     try {
       setLoading(true);
-      let response = await api.get("/user/saved-blogs");
+
+      let response = await api.get(`saved-blogs?page=${page}&limit=${limit}`);
+
       setBlogs(response.data.data);
-    } catch (error) {
+      setTotalBlogCount(response.data.total_records_count);
+    }
+    catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data.message);
       }
@@ -53,9 +60,7 @@ const SavedBlogs: React.FC = () => {
               <Row className="g-4">
                 {blogs.map((blog, index) => (
                   <Col key={index} xs={12} md={6} lg={4}>
-                    <div>
                       <BlogCard blog={blog} />
-                    </div>
                   </Col>
                 ))}
               </Row>
@@ -68,6 +73,8 @@ const SavedBlogs: React.FC = () => {
           </>
         )}
       </Container>
+
+      <PaginationBtns fetchBlogs={fetchSavedBlogs} totalCount={totalBlogCount} />
     </div>
   );
 };

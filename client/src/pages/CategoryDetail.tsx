@@ -8,21 +8,25 @@ import Loader from '../components/Loader';
 import api from '../api/axiosInstance';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import PaginationBtns from '../components/PaginationBtns';
+import {PAGE_SIZE} from "../constants/constant";
 
 const CategoryDetail: React.FC = () => {
   const { category } = useParams<{ category: string }>();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalBlogCount, setTotalBlogCount] = useState<number>(0);
   const navigate = useNavigate();
 
   const location = useLocation();
   const { categoryId } = location.state as { categoryId: string };
 
-  const getBlogsByCategory = async () => {
+  const getBlogsByCategory = async (page=1, limit=PAGE_SIZE || 12) => {
     try {
       setLoading(true);
-      let response = await api.get(`/blog?categoryId=${categoryId}`);
+      let response = await api.get(`/blog?categoryId=${categoryId}&page=${page}&limit=${limit}`);
       setBlogs(response.data.data);
+      setTotalBlogCount(response.data.total_records_count);
     }
     catch (error) {
       if (axios.isAxiosError(error)) {
@@ -37,6 +41,13 @@ const CategoryDetail: React.FC = () => {
   useEffect(() => {
     getBlogsByCategory()
   }, [])
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "instant"
+    })
+  }, [getBlogsByCategory])
 
 
   return (
@@ -73,6 +84,8 @@ const CategoryDetail: React.FC = () => {
           </>
         )}
       </Container>
+
+      <PaginationBtns fetchBlogs={getBlogsByCategory} totalCount={totalBlogCount} />
     </div>
   );
 };

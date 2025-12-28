@@ -1,26 +1,42 @@
+import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import AuthProvider, { useAuth } from "./context/AuthContext";
 import { ThemeProvider } from './context/ThemeContext';
+import { NotificationProvider } from './context/NotificationContext';
+import BlogContextProvider from './context/BlogContext';
+
 import NavBar from './components/Navbar';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import BlogList from './pages/BlogList';
-import WriteBlog from './pages/WriteBlog';
-import Profile from './pages/Profile';
-import NotificationsPage from './pages/Notifications';
-import UserProfile from './pages/UserProfile';
-import MyBlogs from './pages/MyBlogs';
-import SavedBlogs from './pages/SavedBlogs';
-import Categories from './pages/Categories';
-import CategoryDetail from './pages/CategoryDetail';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
-import Support from './pages/Support';
-import Help from './pages/Help';
-import AdminPanel from './pages/AdminPanel';
+import Footer from './components/Footer';
+import Loader from './components/Loader';
+
 import ProtectedRoute from './utils/ProtectedRoute';
+
+
+const Login = React.lazy(() => import('./pages/Login'));
+const Signup = React.lazy(() => import('./pages/Signup'));
+
+const BlogList = React.lazy(() => import("./pages/BlogList"));
+const WriteBlog = React.lazy(() => import('./pages/WriteBlog'));
+const Profile = React.lazy(() => import('./pages/Profile'));
+const NotificationsPage = React.lazy(() => import('./pages/Notifications'));
+const UserProfile = React.lazy(() => import('./pages/UserProfile'));
+const MyBlogs = React.lazy(() => import('./pages/MyBlogs'));
+const SavedBlogs = React.lazy(() => import('./pages/SavedBlogs'));
+const Categories = React.lazy(() => import('./pages/Categories'));
+const CategoryDetail = React.lazy(() => import('./pages/CategoryDetail'));
+const Terms = React.lazy(() => import('./pages/Terms'));
+const Privacy = React.lazy(() => import('./pages/Privacy'));
+const Support = React.lazy(() => import('./pages/Support'));
+const Help = React.lazy(() => import('./pages/Help'));
+const AdminPanel = React.lazy(() => import('./pages/AdminPanel'));
+const Notifications = React.lazy(() => import('./components/Notifications'));
+const NotFound = React.lazy(() => import('./pages/NotFound'));
+const BlogWrapper = React.lazy(() => import('./pages/BlogWrapper'));
+
 import { ToastContainer } from 'react-toastify';
 import './App.css';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorFallback from './utils/ErrorBoundary';
 
 const AppContent: React.FC = () => {
   const { isAuthchecked, loading } = useAuth();
@@ -49,151 +65,155 @@ const AppContent: React.FC = () => {
       {path !== '/login' && path !== '/signup' && <NavBar />}
       <ToastContainer limit={1} autoClose={3000} pauseOnHover />
       <div className="flex-grow-1">
-        <Routes>
-          {/* Auth Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/blogs" index element={<BlogList />} />
+        <ErrorBoundary fallback={<ErrorFallback />} onReset={() => {}}>
+          <Suspense fallback={<Loader />}>
+            <Routes>
+              {/* Auth Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/blog/:id"
-            element={
-              <ProtectedRoute>
-                <BlogWrapper />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/terms"
-            element={
-              <ProtectedRoute>
-                <Terms />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/privacy"
-            element={
-              <ProtectedRoute>
-                <Privacy />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/support"
-            element={
-              <ProtectedRoute>
-                <Support />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/help"
-            element={
-              <ProtectedRoute>
-                <Help />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/write"
-            element={
-              <ProtectedRoute>
-                <WriteBlog />
-              </ProtectedRoute>
-            }
-          />
+              {/* Protected Routes */}
+              <Route path="/blogs"
+                index
+                element={
+                  <ProtectedRoute>
+                    <BlogList />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/blog/:id"
+                element={
+                  <ProtectedRoute>
+                    <BlogWrapper />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/terms"
+                element={
+                  <ProtectedRoute>
+                    <Terms />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/privacy"
+                element={
+                  <ProtectedRoute>
+                    <Privacy />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/support"
+                element={
+                  <ProtectedRoute>
+                    <Support />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/help"
+                element={
+                  <ProtectedRoute>
+                    <Help />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/write"
+                element={
+                  <ProtectedRoute>
+                    <WriteBlog />
+                  </ProtectedRoute>
+                }
+              />
 
-          <Route
-            path="/categories"
-            element={
-              <ProtectedRoute>
-                <Categories />
-              </ProtectedRoute>
-            }
-          />
+              <Route
+                path="/categories"
+                element={
+                  <ProtectedRoute>
+                    <Categories />
+                  </ProtectedRoute>
+                }
+              />
 
-          <Route
-            path="/categories/:category"
-            element={
-              <ProtectedRoute>
-                <CategoryDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
+              <Route
+                path="/categories/:category"
+                element={
+                  <ProtectedRoute>
+                    <CategoryDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
 
-          <Route
-            path="/my-blogs"
-            element={
-              <ProtectedRoute>
-                <MyBlogs />
-              </ProtectedRoute>
-            }
-          />
+              <Route
+                path="/my-blogs"
+                element={
+                  <ProtectedRoute>
+                    <MyBlogs />
+                  </ProtectedRoute>
+                }
+              />
 
-          <Route
-            path="/saved-blogs"
-            element={
-              <ProtectedRoute>
-                <SavedBlogs />
-              </ProtectedRoute>
-            }
-          />
+              <Route
+                path="/saved-blogs"
+                element={
+                  <ProtectedRoute>
+                    <SavedBlogs />
+                  </ProtectedRoute>
+                }
+              />
 
-          <Route
-            path="/user/:id"
-            element={
-              <ProtectedRoute>
-                <UserProfile />
-              </ProtectedRoute>
-            }
-          />
+              <Route
+                path="/user/:id"
+                element={
+                  <ProtectedRoute>
+                    <UserProfile />
+                  </ProtectedRoute>
+                }
+              />
 
-          <Route
-            path="/notifications"
-            element={
-              <ProtectedRoute>
-                <NotificationsPage />
-              </ProtectedRoute>
-            }
-          />
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <NotificationsPage />
+                  </ProtectedRoute>
+                }
+              />
 
-          {/* Admin Route */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <AdminPanel />
-              </ProtectedRoute>
-            }
-          />
+              {/* Admin Route */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminPanel />
+                  </ProtectedRoute>
+                }
+              />
 
-          {/* 404 Fallback */}
-          <Route path="/" element={<Navigate to="/blogs" />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+              {/* 404 Fallback */}
+              <Route path="/" element={<Navigate to="/blogs" />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
       </div>
       {path !== '/login' && path !== '/signup' && <Footer />}
     </div>
   );
 };
 
-import Footer from './components/Footer';
-import Notifications from './components/Notifications';
-import { NotificationProvider } from './context/NotificationContext';
-import NotFound from './pages/NotFound';
-import BlogContextProvider from './context/BlogContext';
-import { useEffect } from 'react';
-import BlogWrapper from './pages/BlogWrapper';
 
 const App: React.FC = () => {
   return (

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-// import Editor from '../components/Editor';
 import '../styles/WriteBlog.css';
 import axios from 'axios';
 import api from '../api/axiosInstance';
@@ -23,7 +22,6 @@ const WriteBlog: React.FC = () => {
     category: ""
   });
 
-  const [error, setError] = useState<string | null>(null);
   const { blogCategories, getAllBlogsCategories, updateBlogCategoryCount } = useBlog();
 
   useEffect(() => {
@@ -33,7 +31,7 @@ const WriteBlog: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.content || !formData.category) {
-      setError('Title, content, and category are required');
+      toast.error('All fields are required');
       return;
     }
 
@@ -61,7 +59,6 @@ const WriteBlog: React.FC = () => {
   return (
     <Container className="py-5">
       <h1 className="mb-3">✍️ Write a New Blog</h1>
-      {error && <Alert variant="danger">{error}</Alert>}
 
       <Form onSubmit={handleSubmit} className="write-blog-form">
 

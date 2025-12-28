@@ -1,18 +1,18 @@
 const { Schema, model } = require('mongoose');
-const { blogCategories } = require('../utils/constants');
+// const { blogCategories } = require('../utils/constants');
 
 const blogSchema = new Schema({
     title: {
         type: String,
         required: true,
-        maxLength: 100,
-        minLength: 5
+        maxLength: [100, "Title should not exceed 100 characters"],
+        minLength: [5, "Title should be of min. 5 characters"]
     },
     content: {
         type: String,
         required: true,
-        minLength: 20,
-        maxLength: 5000
+        minLength: [20, "Content should be of min. 20 characters"],
+        maxLength: [5000, "Content should not exceed 5000 characters"]
     },
     author: {
         type: Schema.Types.ObjectId,
@@ -46,6 +46,10 @@ const blogSchema = new Schema({
     commentsCount: {
         type: Number,
         default: 0
+    }, 
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 

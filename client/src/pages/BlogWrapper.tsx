@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import type { Blog } from '../types';
 import BlogDetail from './BlogDetail';
 import EditBlog from './EditBlog';

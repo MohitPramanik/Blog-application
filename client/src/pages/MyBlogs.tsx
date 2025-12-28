@@ -7,16 +7,20 @@ import Loader from '../components/Loader';
 import api from '../api/axiosInstance';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { PAGE_SIZE } from "../constants/constant";
+import PaginationBtns from '../components/PaginationBtns';
 
 const MyBlogs: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(false);
+  const [totalBlogCount, setTotalBlogCount] = useState<number>(0);
 
-  const fetchUserBlogs = async () => {
+  const fetchUserBlogs = async (page = 1, limit = PAGE_SIZE || 12) => {
     try {
       setLoading(true);
-      let response = await api.get("/blog/user");
+      let response = await api.get(`/blog/user?page=${page}&limit=${limit}`);
       setBlogs(response.data.data);
+      setTotalBlogCount(response.data.total_records_count);
     }
     catch (error) {
       if (axios.isAxiosError(error)) {
@@ -32,6 +36,13 @@ const MyBlogs: React.FC = () => {
   useEffect(() => {
     fetchUserBlogs();
   }, [])
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "instant"
+    })
+  }, [fetchUserBlogs])
 
 
   return (
@@ -65,6 +76,8 @@ const MyBlogs: React.FC = () => {
           </>
         )}
       </Container>
+
+      <PaginationBtns fetchBlogs={fetchUserBlogs} totalCount={totalBlogCount} />
     </div>
   );
 };

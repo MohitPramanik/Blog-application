@@ -35,7 +35,8 @@ button:disabled {
   pointer-events: all !important;
 }
 
-button, button:focus-visible {
+button,
+button:focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
@@ -82,8 +83,29 @@ html {
   border: 1px solid #efefef40;
 }
 
-.Toastify__toast-container--top-right  {
+.Toastify__toast-container--top-right {
   background-color: transparent !important;
+}
+
+.alert.alert-danger {
+  background-color: #fdc4c4 !important;
+  color: #950101 !important;
+}
+
+.theme-dark {
+  .alert.alert-danger {
+    background-color: #0d0036 !important;
+    color: white !important;
+    border-color: green;
+  }
+}
+
+.Toastify__progress-bar--error {
+    background-color: var(--toastify-color-progress-error) !important;
+}
+
+.Toastify__progress-bar--success {
+    background-color: #07bc0c !important;
 }
 
 /* Responsive utilities */

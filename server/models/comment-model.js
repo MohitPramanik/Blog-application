@@ -14,8 +14,8 @@ const commentSchema = new Schema({
     content: {
         type: String,
         required: true,
-        minLength: 1,
-        maxLength: 1000
+        minLength: [1, "Minimum allowed character is 1"],
+        maxLength: [1000, "Comment should not exceed 1000 characters"]
     },
     likedBy: {
         type: [Schema.Types.ObjectId],

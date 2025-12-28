@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 type BlogCateogyCardProps = {
     category: {
         _id: string,
@@ -32,4 +34,4 @@ const BlogCategoryCard: React.FC<BlogCateogyCardProps> = ({ category }) => {
     )
 }
 
-export default BlogCategoryCard
+export default memo(BlogCategoryCard);

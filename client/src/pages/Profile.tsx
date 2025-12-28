@@ -98,6 +98,13 @@ const Profile: React.FC = () => {
     }
   };
 
+  const handleImageError = () => {
+          setUser(prev => ({
+        ...prev,
+        profileImageUrl: profileImagePlaceholder
+      }));
+  }
+
 
   if (loading) {
     return (
@@ -122,6 +129,8 @@ const Profile: React.FC = () => {
               width={140}
               height={140}
               alt="Avatar"
+              loading='lazy'
+              onError={handleImageError}
               className="profile-avatar mb-2"
             />
 
@@ -150,7 +159,7 @@ const Profile: React.FC = () => {
 
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
-              <Form.Control value={userData.email} disabled />
+              <Form.Control value={userData.email} disabled className='bg-secondary-subtle' />
             </Form.Group>
 
             <Form.Group className="mb-3">

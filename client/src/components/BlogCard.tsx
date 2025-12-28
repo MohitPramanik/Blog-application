@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { Card, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import type { Blog } from '../types';
@@ -19,6 +19,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
 
    const truncatedHtml = truncate(blog.content, 120, { ellipsis: "..." });
 
+   const handleImageLoadError = useCallback((e:any) => {
+    e.currentTarget.src = profileImagePlaceholder
+   }, [])
+
   return (
     <Link to={`/blog/${blog._id}`} className="blog-card-link">
       <Card className="blog-card h-100 shadow-sm">
@@ -34,7 +38,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
               <img
                 src={blog.author?.profileImageUrl || profileImagePlaceholder}
                 alt="Username"
+                loading="lazy"
                 className="author-avatar"
+                onError={handleImageLoadError}
               />
               <div className="author-info">
                 <p className="mb-0 fw-500">{blog.author?.username}</p>
@@ -57,4 +63,4 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
   );
 };
 
-export default BlogCard;
+export default memo(BlogCard);

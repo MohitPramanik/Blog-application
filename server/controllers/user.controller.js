@@ -129,87 +129,6 @@ const checkAuth = async (req, res) => {
 };
 
 
-const saveBlog = async (req, res) => {
-    const { blogId } = req.params;
-    const userId = req.user.id;
-
-    try {
-        await User.findByIdAndUpdate(userId, {
-            $addToSet: { savedBlogs: blogId }
-        })
-
-        return res.status(200).json({
-            status: "SUCCESS",
-            message: "Blog saved successfully"
-        })
-    }
-    catch (error) {
-        return res.status(500).json({
-            status: "FAILED",
-            message: "Failed to save the blog",
-            error: error.message
-        })
-    }
-}
-
-
-const unsaveBlog = async (req, res) => {
-    const { blogId } = req.params;
-    const userId = req.user.id;
-
-    try {
-        await User.findByIdAndUpdate(userId, {
-            $pull: { savedBlogs: blogId }
-        })
-
-        return res.status(200).json({
-            status: "SUCCESS",
-            message: "Blog removed from saved list"
-        })
-    }
-    catch (error) {
-        return res.status(500).json({
-            status: "FAILED",
-            message: "Failed to remove blog from saved list",
-            error: error.message
-        })
-    }
-}
-
-
-const getSavedBlogs = async (req, res) => {
-    try {
-
-        let { id: userId } = req.user;
-
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
-
-
-        let result =
-            await User.findById(userId)
-                .select({ savedBlogs: 1 })
-                .populate("savedBlogs")
-                .skip(skip)
-                .limit(limit)
-                .lean();
-
-        return res.status(200).json({
-            status: "SUCCESS",
-            data: result.savedBlogs
-        })
-
-    } catch (error) {
-        return res.status(500).json({
-            status: "FAILED",
-            message: "Failed to fetch the saved blogs",
-            error: error.message
-        })
-    }
-}
-
-
 const followAnotherProfile = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -390,9 +309,6 @@ module.exports = {
     loginUser,
     getUserById,
     checkAuth,
-    saveBlog,
-    unsaveBlog,
-    getSavedBlogs,
     followAnotherProfile,
     unfollowAnotherProfile,
     updateProfile

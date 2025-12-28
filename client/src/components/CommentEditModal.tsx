@@ -1,7 +1,7 @@
 import { Button, Modal, Form } from 'react-bootstrap'
 import "../styles/CommentEditModal.css";
 import type { EditingCommentType } from '../types';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 type CommentEditModalType = {
     editingComment: EditingCommentType | null;
@@ -66,4 +66,4 @@ const CommentEditModal: React.FC<CommentEditModalType> = ({ editingComment, show
     )
 }
 
-export default CommentEditModal
+export default memo(CommentEditModal);
