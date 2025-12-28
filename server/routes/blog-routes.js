@@ -6,7 +6,7 @@ const router = Router();
 
 
 router.route("/")
-    .get(blogController.getAllBlogs)  // get all blogs
+    .get(isLoggedIn, blogController.getAllBlogs)  // get all blogs
     .post(isLoggedIn, blogController.createNewBlog); // create new blog
 
 
