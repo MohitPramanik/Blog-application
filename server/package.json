@@ -4,7 +4,7 @@
   "description": "This is a learning management portal",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "author": "Mohit Kumar Pramanik",
   "license": "ISC",
