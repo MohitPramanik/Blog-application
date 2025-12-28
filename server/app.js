@@ -14,7 +14,7 @@ const { errorHandler } = require("./utils/ExpressError");
 
 
 const corsOptions = {
-    origin: "http://localhost:5173",
+    origin: "https://bloghub-fe.onrender.com",
     optionsSuccessStatus: 200,
 }
 
