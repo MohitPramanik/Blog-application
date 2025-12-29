@@ -90,6 +90,10 @@ textarea {
   }
 }
 
+.w-max {
+  width: max-content;
+}
+
 body {
   margin: 0;
   min-width: 320px;

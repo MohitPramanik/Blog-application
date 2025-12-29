@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import '../styles/Footer.css';
+import { FaLinkedin, FaInstagram, FaGithub } from "react-icons/fa";
 
 const Footer: React.FC = () => {
   const year = new Date().getFullYear();
@@ -9,74 +10,58 @@ const Footer: React.FC = () => {
   return (
     <footer className="app-footer py-4 mt-5">
       <Container>
-        <Row className="align-items-center text-center text-md-start">
+        <div className="d-flex justify-content-md-between justify-content-center align-items-center flex-column flex-md-row gap-3">
 
-          {/* Left section */}
-          <Col md={6} className="mb-3 mb-md-0">
+          <div className="mb-md-0 mb-3 w-max">
             <small>© {year} Blogging App. All rights reserved.</small>
-          </Col>
+          </div>
 
-          {/* Right section */}
-          <Col md={6}>
-            <div className="d-flex flex-column flex-md-row align-items-center justify-content-md-end gap-3">
+          {/* Social icons */}
+          <div className="ms-md-auto me-md-3 d-flex align-items-center gap-3 social-icons">
+            <a
+              href="https://www.linkedin.com/in/mohitkumarpramanik/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="LinkedIn"
+              className="social-icon"
+            >
+              {/* LinkedIn SVG */}
+              <FaLinkedin />
+            </a>
 
-              {/* Social icons */}
-              <div className="d-flex align-items-center gap-3 social-icons">
-                <a
-                  href="https://www.linkedin.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="LinkedIn"
-                  className="social-icon"
-                >
-                  {/* LinkedIn SVG */}
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M4.98 3.5C4.98 4.604 4.09 5.5 2.99 5.5 1.89 5.5 1 4.604 1 3.5 1 2.396 1.89 1.5 2.99 1.5c1.1 0 1.99.896 1.99 2z" fill="currentColor"/>
-                    <path d="M1 8.25h4v12.75H1V8.25zM8.5 8.25h3.82v1.74h.05c.53-1.01 1.82-2.08 3.75-2.08 4.01 0 4.75 2.64 4.75 6.08v7.01h-4V14.1c0-1.46-.03-3.33-2.03-3.33-2.03 0-2.34 1.58-2.34 3.22v6.26h-4V8.25z" fill="currentColor"/>
-                  </svg>
-                </a>
+            <a
+              href="https://www.instagram.com/mohitpramanik_/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Instagram"
+              className="social-icon"
+            >
+              {/* Instagram SVG */}
+              <FaInstagram />
+            </a>
 
-                <a
-                  href="https://www.instagram.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Instagram"
-                  className="social-icon"
-                >
-                  {/* Instagram SVG */}
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M17.5 6.5h.01" stroke="currentColor" strokeWidth="1.5"/>
-                  </svg>
-                </a>
+            <a
+              href="https://github.com/MohitPramanik"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub"
+              className="social-icon"
+            >
+              {/* GitHub SVG */}
+              <FaGithub />
+            </a>
+          </div>
 
-                <a
-                  href="https://github.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="GitHub"
-                  className="social-icon"
-                >
-                  {/* GitHub SVG */}
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 .5C5.73.5.97 5.26.97 11.53c0 4.66 3.03 8.62 7.24 10.01.53.1.72-.23.72-.51 0-.25-.01-1.09-.02-1.98-2.95.64-3.57-1.29-3.57-1.29-.48-1.23-1.17-1.56-1.17-1.56-.96-.66.07-.65.07-.65 1.06.08 1.62 1.09 1.62 1.09.94 1.61 2.47 1.15 3.07.88.09-.69.37-1.15.67-1.41-2.36-.27-4.85-1.18-4.85-5.24 0-1.16.41-2.1 1.08-2.84-.11-.27-.47-1.36.1-2.84 0 0 .88-.28 2.88 1.08a9.97 9.97 0 0 1 2.62-.35c.89 0 1.79.12 2.62.35 2-1.36 2.88-1.08 2.88-1.08.57 1.48.21 2.57.1 2.84.67.74 1.08 1.68 1.08 2.84 0 4.07-2.49 4.96-4.86 5.23.38.33.72.98.72 1.98 0 1.43-.01 2.58-.01 2.93 0 .28.19.61.73.51C19 20.15 21 16.19 21 11.53 21 5.26 16.27.5 12 .5z" fill="currentColor"/>
-                  </svg>
-                </a>
-              </div>
+          {/* Footer links */}
+          <div className="d-flex flex-wrap justify-content-center justify-content-md-end gap-3">
+            <Link to="/help">Help</Link>
+            <Link to="/support">Support</Link>
+            <Link to="/terms">Terms</Link>
+            <Link to="/privacy">Privacy</Link>
+          </div>
 
-              {/* Footer links */}
-              <div className="d-flex flex-wrap justify-content-center justify-content-md-end gap-3">
-                <Link to="/help">Help</Link>
-                <Link to="/support">Support</Link>
-                <Link to="/terms">Terms</Link>
-                <Link to="/privacy">Privacy</Link>
-              </div>
 
-            </div>
-          </Col>
-
-        </Row>
+        </div>
       </Container>
     </footer>
   );

@@ -3,6 +3,12 @@
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+.theme-dark {
+  .app-footer {
+    border-top: 1px solid rgb(255 252 252 / 17%);
+  }
+}
+
 .app-footer a {
   color: var(--bs-body-color, #212529);
   text-decoration: none;
@@ -32,7 +38,8 @@
 }
 
 .social-icon:hover {
-  color: #6366f1; /* indigo tint on hover */
+  color: #6366f1;
+  /* indigo tint on hover */
   transform: translateY(-1px);
 }
 
