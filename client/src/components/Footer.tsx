@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import '../styles/Footer.css';
 import { FaLinkedin, FaInstagram, FaGithub } from "react-icons/fa";
