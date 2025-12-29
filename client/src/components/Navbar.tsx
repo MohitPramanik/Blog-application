@@ -7,7 +7,7 @@ import {
   Dropdown,
   Offcanvas
 } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 // import { useNotification } from '../context/NotificationContext';
