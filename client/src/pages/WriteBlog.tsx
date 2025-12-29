@@ -35,6 +35,23 @@ const WriteBlog: React.FC = () => {
       return;
     }
 
+    if (formData.title.length < 5) {
+      toast.error("Title should be of min. 5 characters");
+      return;
+    }
+    else if (formData.content.length < 20) {
+      toast.error("Content should be of min. 20 characters");
+      return;
+    }
+    else if (formData.title.length > 100) {
+      toast.error("Title should not exceed 100 characters");
+      return;
+    }
+    else if (formData.content.length > 5000) {
+      toast.error("Content should not exceed 5000 characters");
+      return;
+    }
+
     try {
       let response = await api.post("/blog", formData);
       toast.success(response.data.message);
@@ -76,12 +93,12 @@ const WriteBlog: React.FC = () => {
         <Form.Group className="mb-3">
           <Form.Label>Category</Form.Label>
           <Form.Select aria-label="Default select example" onChange={handleChange} name='category'>
-              <option>Select</option>
-              {
-                blogCategories.map((category) => (
-                  <option key={category?._id} value={category._id}>{category.name}</option>
-                ))
-              }
+            <option>Select</option>
+            {
+              blogCategories.map((category) => (
+                <option key={category?._id} value={category._id}>{category.name}</option>
+              ))
+            }
           </Form.Select>
         </Form.Group>
 

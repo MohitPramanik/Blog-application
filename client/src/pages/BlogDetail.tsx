@@ -27,7 +27,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blog, setBlog, onEdit }) => {
   const navigate = useNavigate();
   const [commentCount, setCommentCount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const {updateBlogCategoryCount} = useBlog();
+  const { updateBlogCategoryCount } = useBlog();
 
   const [userActions, setUserActions] = useState({
     saved: false,
@@ -254,19 +254,23 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blog, setBlog, onEdit }) => {
 
                 </div>
 
-                <div className="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
-                  <Image
-                    src={blog?.author?.profileImageUrl || profileImagePlaceholder}
-                    alt={blog?.author?.username || "profile image"}
-                    roundedCircle
-                    width={48}
-                    height={48}
-                    className='object-fit-cover'
-                  />
-                  <div className="flex-grow-1">
-                    <p className="mb-0 fw-bold">{blog.author?.username || "User"}</p>
-                    <small className="text-muted">{formatTimeToPeriod(blog.createdAt || "")}</small>
+                <div className="d-flex justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
+                  <div className='d-flex align-items-center gap-3'>
+                    <Image
+                      src={blog?.author?.profileImageUrl || profileImagePlaceholder}
+                      alt={blog?.author?.username || "profile image"}
+                      roundedCircle
+                      width={48}
+                      height={48}
+                      className='object-fit-cover'
+                      loading='lazy'
+                    />
+                    <div className="flex-grow-1">
+                      <p className="mb-0 fw-bold">{blog.author?.username || "User"}</p>
+                      <small className="text-muted">{formatTimeToPeriod(blog.createdAt || "")}</small>
+                    </div>
                   </div>
+
 
                   {
                     (user?.userId !== blog.author?._id) &&

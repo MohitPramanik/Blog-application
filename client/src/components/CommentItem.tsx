@@ -57,6 +57,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, user, onLike, onDisl
               width={40}
               height={40}
               className="flex-shrink-0 object-fit-cover"
+              loading='lazy'
             />
 
             <div className="flex-grow-1">

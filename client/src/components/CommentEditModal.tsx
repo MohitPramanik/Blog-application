@@ -59,7 +59,7 @@ const CommentEditModal: React.FC<CommentEditModalType> = ({ editingComment, show
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button onClick={handleSaveChanges} disabled={!modalText}>Save Changes</Button>
+                <Button className='primary-btn' onClick={handleSaveChanges} disabled={!modalText}>Save Changes</Button>
                 <Button onClick={onHide}>Close</Button>
             </Modal.Footer>
         </Modal>

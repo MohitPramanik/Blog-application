@@ -110,7 +110,7 @@ const CommentArea: React.FC<CommentAreaProps> = ({ blogId = "", increaseCommentC
         }
     }
 
-    const handleUpdateComment = useCallback(() => async (message: string) => {
+    const handleUpdateComment = useCallback(async(message: string) => {
         try {
             await api.put(`/comment/${editingComment?.id}`, {
                 content: message
