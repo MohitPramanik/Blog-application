@@ -152,7 +152,7 @@ const NavBar: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { theme } = useTheme();
 
-  const [expanded, setExpanded] = useState<boolean>(true);
+  const [expanded, setExpanded] = useState<boolean>(false);
 
   const handleCloseExpanded = () => {
     setExpanded(false);
