@@ -1,39 +1,39 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import AuthProvider, { useAuth } from "./context/AuthContext";
 import { ThemeProvider } from './context/ThemeContext';
-import { NotificationProvider } from './context/NotificationContext';
-import BlogContextProvider from './context/BlogContext';
 
-import NavBar from './components/Navbar';
-import Footer from './components/Footer';
 import Loader from './components/Loader';
+import NavBar from './components/Navbar';
 
 import ProtectedRoute from './utils/ProtectedRoute';
 
 
-const Login = React.lazy(() => import('./pages/Login'));
-const Signup = React.lazy(() => import('./pages/Signup'));
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
 
-const BlogList = React.lazy(() => import("./pages/BlogList"));
-const WriteBlog = React.lazy(() => import('./pages/WriteBlog'));
-const Profile = React.lazy(() => import('./pages/Profile'));
-const NotificationsPage = React.lazy(() => import('./pages/Notifications'));
-const UserProfile = React.lazy(() => import('./pages/UserProfile'));
-const MyBlogs = React.lazy(() => import('./pages/MyBlogs'));
-const SavedBlogs = React.lazy(() => import('./pages/SavedBlogs'));
-const Categories = React.lazy(() => import('./pages/Categories'));
-const CategoryDetail = React.lazy(() => import('./pages/CategoryDetail'));
-const Terms = React.lazy(() => import('./pages/Terms'));
-const Privacy = React.lazy(() => import('./pages/Privacy'));
-const Support = React.lazy(() => import('./pages/Support'));
-const Help = React.lazy(() => import('./pages/Help'));
-const AdminPanel = React.lazy(() => import('./pages/AdminPanel'));
-const Notifications = React.lazy(() => import('./components/Notifications'));
-const NotFound = React.lazy(() => import('./pages/NotFound'));
-const BlogWrapper = React.lazy(() => import('./pages/BlogWrapper'));
+// const NotificationProvider = lazy(() => import('./context/NotificationContext'));
+const Footer = lazy(() => import('./components/Footer'));
+const BlogContextProvider = lazy(() => import('./context/BlogContext'));
+const BlogList = lazy(() => import("./pages/BlogList"));
+const WriteBlog = lazy(() => import('./pages/WriteBlog'));
+const Profile = lazy(() => import('./pages/Profile'));
+const NotificationsPage = lazy(() => import('./pages/Notifications'));
+const UserProfile = lazy(() => import('./pages/UserProfile'));
+const MyBlogs = lazy(() => import('./pages/MyBlogs'));
+const SavedBlogs = lazy(() => import('./pages/SavedBlogs'));
+const Categories = lazy(() => import('./pages/Categories'));
+const CategoryDetail = lazy(() => import('./pages/CategoryDetail'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Support = lazy(() => import('./pages/Support'));
+const Help = lazy(() => import('./pages/Help'));
+const AdminPanel = lazy(() => import('./pages/AdminPanel'));
+// const Notifications = lazy(() => import('./components/Notifications'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const BlogWrapper = lazy(() => import('./pages/BlogWrapper'));
 
-import { ToastContainer } from 'react-toastify';
+const ToastContainer = lazy(() => import('react-toastify').then(m => ({ default: m.ToastContainer })));
 import './App.css';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorFallback from './utils/ErrorBoundary';
@@ -65,7 +65,7 @@ const AppContent: React.FC = () => {
       {path !== '/login' && path !== '/signup' && <NavBar />}
       <ToastContainer limit={1} autoClose={3000} pauseOnHover />
       <div className="flex-grow-1">
-        <ErrorBoundary fallback={<ErrorFallback />} onReset={() => {}}>
+        <ErrorBoundary fallback={<ErrorFallback />} onReset={() => { }}>
           <Suspense fallback={<Loader />}>
             <Routes>
               {/* Auth Routes */}
@@ -220,12 +220,11 @@ const App: React.FC = () => {
     <Router>
       <ThemeProvider>
         <AuthProvider>
-          <NotificationProvider>
-            <BlogContextProvider>
-              <AppContent />
-            </BlogContextProvider>
-            <Notifications />
-          </NotificationProvider>
+          {/* <NotificationProvider> */}
+          <BlogContextProvider>
+            <AppContent />
+          </BlogContextProvider>
+          {/* </NotificationProvider> */}
         </AuthProvider>
       </ThemeProvider>
     </Router>

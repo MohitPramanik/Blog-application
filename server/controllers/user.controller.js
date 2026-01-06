@@ -122,10 +122,19 @@ const checkAuth = async (req, res) => {
 
     let user = await User.findById(req.user.id).select({ password: 0 });
 
-    return res.status(200).json({
-        success: true,
-        user: user
-    });
+    if (user) {
+        return res.status(200).json({
+            success: true,
+            user: user
+        });
+    }
+    else {
+        return res.status(500).json({
+            success: fail,
+            message: "No user found"
+        })
+    }
+
 };
 
 
