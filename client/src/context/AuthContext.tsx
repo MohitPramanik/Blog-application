@@ -48,8 +48,6 @@ const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
             role,
             dob
           })
-
-          navigate("/blogs", {replace: true})
         }
         else {
           setIsAuthChecked(false);
@@ -64,9 +62,7 @@ const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
       }
     }
 
-    if (!isAuthchecked) {
-      checkAuth();
-    }
+    checkAuth();
   }, []);
 
   const login = async (email: string, password: string) => {

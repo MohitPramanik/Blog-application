@@ -4,15 +4,14 @@ import AuthProvider, { useAuth } from "./context/AuthContext";
 import { ThemeProvider } from './context/ThemeContext';
 
 import Loader from './components/Loader';
-import NavBar from './components/Navbar';
 
-import ProtectedRoute from './utils/ProtectedRoute';
-
+const ProtectedRoute = lazy(() => import('./utils/ProtectedRoute'));
 
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 
 // const NotificationProvider = lazy(() => import('./context/NotificationContext'));
+const NavBar = lazy(() => import('./components/Navbar'));
 const Footer = lazy(() => import('./components/Footer'));
 const BlogContextProvider = lazy(() => import('./context/BlogContext'));
 const BlogList = lazy(() => import("./pages/BlogList"));
