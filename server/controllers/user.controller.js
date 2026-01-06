@@ -280,7 +280,7 @@ const updateProfile = async (req, res) => {
             }
         }
 
-        let user = await User.findByIdAndUpdate(userId, updateFields, { runValidators: true });
+        let user = await User.findByIdAndUpdate(userId, updateFields, { new: true, runValidators: true });
 
         if (!user) {
             return res.status(400).json({
