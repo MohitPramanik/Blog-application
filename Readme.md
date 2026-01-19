@@ -103,7 +103,7 @@ npm run dev
 ```
 
 ---
-This project reflects my hands-on experience in building scalable, production-ready full-stack applications, with a strong focus on backend performance, clean architecture, and maintainable code.
+This project reflects my hands-on experience in building scalable, production-ready full-stack applications, with a strong focus on backend performance, clean architecture, and maintainable code. 
 
 
 
