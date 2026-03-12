@@ -51,10 +51,12 @@ const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
         }
         else {
           setIsAuthChecked(false);
+          logout();
         }
       }
       catch (error) {
         setIsAuthenticated(false);
+        logout();
       } finally {
         setIsAuthChecked(true);
         setLoading(false);
@@ -121,6 +123,7 @@ const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
 
   const logout = async () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setIsAuthenticated(false);
     navigate("/login", { replace: true });
   }
