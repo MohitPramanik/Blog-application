@@ -6,6 +6,7 @@ import type { Blog, BlogCategoryType } from '../types';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useBlog } from '../context/BlogContext';
+import { Helmet } from 'react-helmet-async';
 
 type EditBlogProps = {
     blog: Blog | null;
@@ -83,6 +84,12 @@ const EditBlog: React.FC<EditBlogProps> = ({
 
     return (
         <Container className="py-5">
+
+            <Helmet>
+                <title>BlogHub - Edit Blog</title>
+                <meta name="description" content="Edit your blog post on BlogHub" />
+            </Helmet>
+
             <h1>Edit Blog</h1>
 
             <Form onSubmit={handleSubmit}>

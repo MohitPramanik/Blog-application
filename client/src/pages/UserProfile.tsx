@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Image, Row, Col, ListGroup } from 'react-bootstrap';
+import { Helmet } from 'react-helmet-async';
 import { useParams, Link } from 'react-router-dom';
 
 interface MockBlog { id: string; title: string; excerpt: string }
@@ -26,6 +27,12 @@ const UserProfile: React.FC = () => {
 
   return (
     <Container className="py-5">
+
+      <Helmet>
+        <title>BlogHub - User Profile</title>
+        <meta name="description" content="View user profile on BlogHub" />
+      </Helmet>
+
       <Row>
         <Col md={4} className="text-center">
           <Image src={user?.avatar} roundedCircle width={140} height={140} />

@@ -6,6 +6,7 @@ import profileImagePlaceholder from '../assets/common/profile-placeholder.jpg';
 import '../styles/Profile.css';
 import api from '../api/axiosInstance';
 import { toast } from 'react-toastify';
+import { Helmet } from 'react-helmet-async';
 
 type UserDataType = {
   username: string;
@@ -99,10 +100,10 @@ const Profile: React.FC = () => {
   };
 
   const handleImageError = () => {
-          setUser(prev => ({
-        ...prev,
-        profileImageUrl: profileImagePlaceholder
-      }));
+    setUser(prev => ({
+      ...prev,
+      profileImageUrl: profileImagePlaceholder
+    }));
   }
 
 
@@ -118,6 +119,12 @@ const Profile: React.FC = () => {
 
   return (
     <Container className="py-5">
+
+      <Helmet>
+        <title>BlogHub - Profile</title>
+        <meta name="description" content="Manage your profile on BlogHub" />
+      </Helmet>
+
       <div className="profile-card">
         <h1 className="mb-3">Profile</h1>
 

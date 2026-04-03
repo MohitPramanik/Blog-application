@@ -1,8 +1,15 @@
+import { Helmet } from 'react-helmet-async';
 import '../styles/Legal.css';
 
 const AdminPanel: React.FC = () => {
   return (
     <main className="legal-page container py-5" aria-labelledby="admin-title">
+
+      <Helmet>
+        <title>BlogHub - Admin Panel</title>
+        <meta name="description" content="Admin panel for managing the Blogging App" />
+      </Helmet>
+
       <header className="legal-header mb-5">
         <h1 id="admin-title" className="legal-title">Admin Panel</h1>
         <p className="legal-subtitle">Administrative tools for managing the Blogging App.</p>

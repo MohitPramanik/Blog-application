@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import '../styles/Legal.css';
+import { Helmet } from 'react-helmet-async';
 
 const sections = [
 	{
@@ -52,6 +53,12 @@ const sections = [
 const Privacy: React.FC = () => {
 	return (
 		<main className="legal-page container py-5" aria-labelledby="privacy-title">
+
+			<Helmet>
+				<title>BlogHub - Privacy Policy</title>
+				<meta name="description" content="Learn about our privacy practices" />
+			</Helmet>
+
 			<header className="legal-header mb-5">
 				<h1 id="privacy-title" className="legal-title">Privacy Policy</h1>
 				<p className="legal-subtitle">We respect your privacy. This policy explains what we collect, why, and your choices.</p>

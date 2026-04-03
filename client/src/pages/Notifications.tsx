@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Button, ListGroup, Spinner } from 'react-bootstrap';
 import { useNotification } from '../context/NotificationContext';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const PAGE_SIZE = 10;
 
@@ -29,6 +30,12 @@ const NotificationsPage: React.FC = () => {
 
   return (
     <Container className="py-5">
+
+      <Helmet>
+        <title>BlogHub - Notifications</title>
+        <meta name="description" content="Manage your notifications on BlogHub" />
+      </Helmet>
+
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h1>Notifications</h1>
         <div>

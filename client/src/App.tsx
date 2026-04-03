@@ -36,6 +36,7 @@ const ToastContainer = lazy(() => import('react-toastify').then(m => ({ default:
 import './App.css';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorFallback from './utils/ErrorBoundary';
+import { HelmetProvider } from 'react-helmet-async';
 
 const AppContent: React.FC = () => {
   const { isAuthchecked, loading } = useAuth();
@@ -216,17 +217,21 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <ThemeProvider>
-        <AuthProvider>
-          {/* <NotificationProvider> */}
-          <BlogContextProvider>
-            <AppContent />
-          </BlogContextProvider>
-          {/* </NotificationProvider> */}
-        </AuthProvider>
-      </ThemeProvider>
-    </Router>
+    <HelmetProvider>
+      <main>
+        <Router>
+          <ThemeProvider>
+            <AuthProvider>
+              {/* <NotificationProvider> */}
+              <BlogContextProvider>
+                <AppContent />
+              </BlogContextProvider>
+              {/* </NotificationProvider> */}
+            </AuthProvider>
+          </ThemeProvider>
+        </Router>
+      </main>
+    </HelmetProvider>
   );
 };
 

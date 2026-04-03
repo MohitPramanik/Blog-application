@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import '../styles/Legal.css';
+import { Helmet } from 'react-helmet-async';
 
 const sections = [
   {
@@ -40,6 +41,12 @@ const Support: React.FC = () => {
 
   return (
     <main className="legal-page container py-5" aria-labelledby="support-title">
+
+      <Helmet>
+        <title>BlogHub - Support</title>
+        <meta name="description" content="Get help with BlogHub" />
+      </Helmet>
+
       <header className="legal-header mb-5">
         <h1 id="support-title" className="legal-title">Support Center</h1>
         <p className="legal-subtitle">Need help? We're here to assist you. Review the sections below or send us a message.</p>
@@ -66,7 +73,7 @@ const Support: React.FC = () => {
         </section>
 
         <section className="legal-section legal-contact">
-          <div style={{flex:1}}>
+          <div style={{ flex: 1 }}>
             <h2 className="legal-section-title">Contact Support</h2>
             <p className="legal-text">Send us a message and we'll respond as soon as possible (typical response time: 48 hours).</p>
 

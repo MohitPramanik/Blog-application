@@ -3,6 +3,7 @@ import { Container, Form, Button, Card, Spinner, Row, Col } from 'react-bootstra
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Auth.css';
+import { Helmet } from 'react-helmet-async';
 
 const Login: React.FC = () => {
 
@@ -16,7 +17,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if(!loading) {
+    if (!loading) {
       login(loginData.email, loginData.password);
     }
   };
@@ -30,6 +31,12 @@ const Login: React.FC = () => {
 
   return (
     <div className="auth-page min-h-max p-3">
+
+      <Helmet>
+        <title>BlogHub - Login</title>
+        <meta name="description" content="Log in to your BlogHub account" />
+      </Helmet>
+
       <Container>
         <Row className="justify-content-center align-items-center min-vh-100">
           <Col xs={12} sm={10} md={8} lg={5}>

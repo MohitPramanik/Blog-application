@@ -9,7 +9,8 @@ import api from '../api/axiosInstance';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import PaginationBtns from '../components/PaginationBtns';
-import {PAGE_SIZE} from "../constants/constant";
+import { PAGE_SIZE } from "../constants/constant";
+import { Helmet } from 'react-helmet-async';
 
 const CategoryDetail: React.FC = () => {
   const { category } = useParams<{ category: string }>();
@@ -21,7 +22,7 @@ const CategoryDetail: React.FC = () => {
   const location = useLocation();
   const { categoryId } = location.state as { categoryId: string };
 
-  const getBlogsByCategory = async (page=1, limit=PAGE_SIZE || 12) => {
+  const getBlogsByCategory = async (page = 1, limit = PAGE_SIZE || 12) => {
     try {
       setLoading(true);
       let response = await api.get(`/blog?categoryId=${categoryId}&page=${page}&limit=${limit}`);
@@ -52,6 +53,12 @@ const CategoryDetail: React.FC = () => {
 
   return (
     <div className="blog-list-page">
+
+      <Helmet>
+        <title>BlogHub - {category}</title>
+        <meta name="description" content={`Browse blogs in the ${category} category`} />
+      </Helmet>
+
       <Container className="py-5">
         <Row className="mb-4">
           <Col md={8}>

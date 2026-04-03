@@ -6,6 +6,7 @@ import axios from 'axios';
 import api from '../api/axiosInstance';
 import { toast } from 'react-toastify';
 import { useBlog } from '../context/BlogContext';
+import { Helmet } from 'react-helmet-async';
 
 type FormDateType = {
   title: string;
@@ -75,6 +76,12 @@ const WriteBlog: React.FC = () => {
 
   return (
     <Container className="py-5">
+
+      <Helmet>
+        <title>BlogHub - New Blog</title>
+        <meta name="description" content="Write a new blog post on BlogHub" />
+      </Helmet>
+
       <h1 className="mb-3">✍️ Write a New Blog</h1>
 
       <Form onSubmit={handleSubmit} className="write-blog-form">

@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import '../styles/Legal.css';
+import { Helmet } from 'react-helmet-async';
 
 const faqs = [
   {
@@ -41,6 +42,12 @@ const tips = [
 const Help: React.FC = () => {
   return (
     <main className="legal-page container py-5" aria-labelledby="help-title">
+
+      <Helmet>
+        <title>BlogHub - Help</title>
+        <meta name="description" content="Get help and find answers to common questions about BlogHub" />
+      </Helmet>
+
       <header className="legal-header mb-5">
         <h1 id="help-title" className="legal-title">Help & FAQs</h1>
         <p className="legal-subtitle">Answers to common questions to help you use the app.</p>

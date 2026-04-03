@@ -5,6 +5,7 @@ import Loader from '../components/Loader';
 import { useBlog } from '../context/BlogContext';
 import BlogCategoryCard from '../components/BlogCategoryCard';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const Categories: React.FC = () => {
   const { blogCategories, getAllBlogsCategories, loading } = useBlog();
@@ -15,6 +16,12 @@ const Categories: React.FC = () => {
 
   return (
     <div className="blog-list-page">
+
+      <Helmet>
+        <title>BlogHub - Categories</title>
+        <meta name="description" content="Browse blogs by category on BlogHub" />
+      </Helmet>
+
       <Container className="py-5">
         <Row className="mb-4">
           <Col md={8}>

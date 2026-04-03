@@ -9,6 +9,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { PAGE_SIZE } from "../constants/constant";
 import PaginationBtns from '../components/PaginationBtns';
+import { Helmet } from 'react-helmet-async';
 
 const MyBlogs: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -47,6 +48,12 @@ const MyBlogs: React.FC = () => {
 
   return (
     <div className="blog-list-page">
+
+      <Helmet>
+        <title>BlogHub - My Blogs</title>
+        <meta name="description" content="Manage your blogs on BlogHub" />
+      </Helmet>
+
       <Container className="py-5">
         <Row className="mb-5">
           <Col md={8}>

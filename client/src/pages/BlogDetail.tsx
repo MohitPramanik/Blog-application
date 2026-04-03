@@ -15,6 +15,7 @@ import { MdEdit, MdDelete } from "react-icons/md";
 import { FaComment } from "react-icons/fa";
 import CommentArea from '../components/CommentArea';
 import { useBlog } from '../context/BlogContext';
+import { Helmet } from 'react-helmet-async';
 
 type BlogDetailProps = {
   blog: Blog | null;
@@ -227,6 +228,11 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blog, setBlog, onEdit }) => {
 
   return (
     <div className="blog-detail-page">
+      <Helmet>
+        <title>BlogHub - {blog.title}</title>
+        <meta name="description" content={`Read this blog post on BlogHub: ${blog.title}`} />
+      </Helmet>
+
       <Container className="py-5">
         <Row className="justify-content-center mb-5">
           <Col lg={8}>

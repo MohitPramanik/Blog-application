@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { PAGE_SIZE } from "../constants/constant";
 import SearchBox from '../components/SearchBox';
 import '../styles/BlogList.css';
+import { Helmet } from 'react-helmet-async';
 
 const BlogCard = React.lazy(() => import('../components/BlogCard'));
 const PaginationBtns = React.lazy(() => import('../components/PaginationBtns'));
@@ -50,7 +51,7 @@ const BlogList: React.FC = () => {
 
 
 
-  const handleSearch = async (searchText:string) => {
+  const handleSearch = async (searchText: string) => {
     try {
       setLoading(true);
 
@@ -88,6 +89,12 @@ const BlogList: React.FC = () => {
 
   return (
     <div className="blog-list-page">
+      
+      <Helmet>
+        <title>BlogHub - All Blogs</title>
+        <meta name="description" content="Browse all blog posts on BlogHub" />
+      </Helmet>
+
       <Container className="py-5">
         <Row className="mb-5">
           <Col md={8}>
