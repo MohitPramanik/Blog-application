@@ -4,6 +4,7 @@ import AuthProvider, { useAuth } from "./context/AuthContext";
 import { ThemeProvider } from './context/ThemeContext';
 
 import Loader from './components/Loader';
+import InitialPageLoader from './components/InitialPageLoader';
 
 const ProtectedRoute = lazy(() => import('./utils/ProtectedRoute'));
 
@@ -50,13 +51,7 @@ const AppContent: React.FC = () => {
   }, [path])
 
   if (loading || !isAuthchecked) {
-    return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
+    return <InitialPageLoader />;
   }
 
 
