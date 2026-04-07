@@ -4,7 +4,7 @@ export type User = {
   email: string;
   profileImageUrl?: string;
   dob?: string;
-  role?: "Admin" | "User" | "";
+  role?: "Admin" | "User" | null;
 }
 
 export interface Blog {

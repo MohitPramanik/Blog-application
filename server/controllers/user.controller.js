@@ -85,7 +85,8 @@ const loginUser = async (req, res) => {
                 username: user.username,
                 email: user.email,
                 profileImageUrl: user.profileImageUrl,
-                dob: user.dob
+                dob: user.dob,
+                role: user.role
             }
         });
 

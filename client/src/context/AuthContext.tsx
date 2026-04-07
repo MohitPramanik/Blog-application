@@ -23,7 +23,7 @@ const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
     email: "",
     dob: "",
     profileImageUrl: "",
-    role: ""
+    role: "User"
   })
 
   const navigate = useNavigate();

@@ -5,8 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 
 import Loader from './components/Loader';
 import InitialPageLoader from './components/InitialPageLoader';
-
-const ProtectedRoute = lazy(() => import('./utils/ProtectedRoute'));
+import ProtectedRoute from './utils/ProtectedRoute';
 
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
@@ -68,134 +67,26 @@ const AppContent: React.FC = () => {
               <Route path="/signup" element={<Signup />} />
 
               {/* Protected Routes */}
-              <Route path="/blogs"
-                index
-                element={
-                  <ProtectedRoute>
-                    <BlogList />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/blog/:id"
-                element={
-                  <ProtectedRoute>
-                    <BlogWrapper />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/terms"
-                element={
-                  <ProtectedRoute>
-                    <Terms />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/privacy"
-                element={
-                  <ProtectedRoute>
-                    <Privacy />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/support"
-                element={
-                  <ProtectedRoute>
-                    <Support />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/help"
-                element={
-                  <ProtectedRoute>
-                    <Help />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/write"
-                element={
-                  <ProtectedRoute>
-                    <WriteBlog />
-                  </ProtectedRoute>
-                }
-              />
+              <Route element={<ProtectedRoute roles={['User', 'Admin']} />}>
+                <Route path="/blogs" index element={<BlogList />} />
+                <Route path="/blog/:id" element={<BlogWrapper />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/support" element={<Support />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/write" element={<WriteBlog />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/categories/:category" element={<CategoryDetail />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/my-blogs" element={<MyBlogs />} />
+                <Route path="/saved-blogs" element={<SavedBlogs />} />
+                <Route path="/user/:id" element={<UserProfile />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
+              </Route>
 
-              <Route
-                path="/categories"
-                element={
-                  <ProtectedRoute>
-                    <Categories />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/categories/:category"
-                element={
-                  <ProtectedRoute>
-                    <CategoryDetail />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/my-blogs"
-                element={
-                  <ProtectedRoute>
-                    <MyBlogs />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/saved-blogs"
-                element={
-                  <ProtectedRoute>
-                    <SavedBlogs />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/user/:id"
-                element={
-                  <ProtectedRoute>
-                    <UserProfile />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/notifications"
-                element={
-                  <ProtectedRoute>
-                    <NotificationsPage />
-                  </ProtectedRoute>
-                }
-              />
-
-              {/* Admin Route */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <AdminPanel />
-                  </ProtectedRoute>
-                }
-              />
+              <Route element={<ProtectedRoute roles={["Admin"]} />} >
+                <Route path="/admin" element={<AdminPanel />} />
+              </Route>
 
               {/* 404 Fallback */}
               <Route path="/" element={<Navigate to="/blogs" />} />
