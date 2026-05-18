@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "bloghub",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,33 +10,32 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^1.13.2",
+    "@hookform/resolvers": "^5.2.2",
+    "@reduxjs/toolkit": "^2.11.2",
+    "axios": "^1.16.1",
     "bootstrap": "^5.3.8",
-    "dompurify": "^3.3.1",
-    "html-truncate": "^1.2.2",
-    "quill": "^2.0.3",
-    "react": "^19.2.3",
+    "react": "^19.2.6",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "^19.2.3",
-    "react-error-boundary": "^6.0.0",
-    "react-helmet-async": "^3.0.0",
-    "react-icons": "^5.5.0",
-    "react-router-dom": "^7.10.1",
-    "react-toastify": "^11.0.5"
+    "react-dom": "^19.2.6",
+    "react-error-boundary": "^6.1.1",
+    "react-hook-form": "^7.75.0",
+    "react-icons": "^5.6.0",
+    "react-redux": "^9.2.0",
+    "react-router": "^7.15.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/html-truncate": "^1.2.4",
-    "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.12.3",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.59.2",
+    "vite": "^8.0.12"
   }
 }

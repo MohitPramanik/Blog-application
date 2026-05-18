@@ -1,194 +1,146 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Form, Button, Image } from 'react-bootstrap';
-import { useAuth } from '../context/AuthContext';
-import { IoMdCamera } from "react-icons/io";
-import profileImagePlaceholder from '../assets/common/profile-placeholder.jpg';
-import '../styles/Profile.css';
-import api from '../api/axiosInstance';
-import { toast } from 'react-toastify';
-import { Helmet } from 'react-helmet-async';
+const user = {
+  name: "Mohit Kumar",
+  username: "@mohitdev",
+  bio: "Frontend Developer passionate about building responsive and interactive web applications using React.js and modern web technologies.",
+  email: "mohit@example.com",
+  location: "Bihar, India",
+  website: "https://portfolio.example.com",
+  joined: "January 2025",
+  followers: 1240,
+  following: 310,
+  posts: 48,
+  profileImage:
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
+};
 
-type UserDataType = {
-  username: string;
-  email: string;
-  dob: string;
-  profileImage: File | null;
-  profilePreviewImageUrl: string;
-}
-
-const Profile: React.FC = () => {
-  const { user, setUser } = useAuth();
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const [userData, setUserData] = useState<UserDataType>({
-    username: '',
-    email: '',
-    dob: '',
-    profileImage: null,  // maintaining this variable to send file to backend
-    profilePreviewImageUrl: "" // to store the image url
-  });
-
-  // Populate data from auth user
-  useEffect(() => {
-    if (!user) return;
-
-    setUserData({
-      username: user.username,
-      email: user?.email,
-      dob: user?.dob || "",
-      profileImage: null,
-      profilePreviewImageUrl: user?.profileImageUrl || ""
-    });
-  }, [user]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUserData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const previewUrl = URL.createObjectURL(file);
-
-    setUserData(prev => ({
-      ...prev,
-      profileImage: file,
-      profilePreviewImageUrl: previewUrl
-    }));
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!userData.username || !userData.dob) {
-      toast.error('Please fill in all required fields.');
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const formData = new FormData();
-      formData.append('username', userData.username);
-      formData.append('dob', userData.dob);
-
-      if (userData.profileImage) {
-        formData.append('profileImage', userData.profileImage);
-      }
-
-      const response = await api.post('/user/profile', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
-
-      setUser(prev => ({
-        ...prev,
-        username: userData.username,
-        dob: userData.dob,
-        profileImageUrl: response?.data.profileUrl
-      }));
-
-      toast.success('Profile updated successfully.');
-    } catch (error) {
-      toast.error('Failed to update profile. Please try again.');
-    }
-    finally {
-      setLoading(false);
-    }
-  };
-
-  const handleImageError = () => {
-    setUser(prev => ({
-      ...prev,
-      profileImageUrl: profileImagePlaceholder
-    }));
-  }
-
-
-  if (loading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+const ProfilePage = () => {
 
   return (
-    <Container className="py-5">
+    <div className="container py-3">
+      <div className="row justify-content-center">
+        <div className="col-lg-9">
+          <div className="card shadow border-0 rounded-4 overflow-hidden">
+            {/* Cover Section */}
+            <div
+              className="bg-dark"
+              style={{
+                height: "220px",
+                backgroundImage:
+                  "linear-gradient(135deg, #343a40, #212529)",
+              }}
+            ></div>
 
-      <Helmet>
-        <title>BlogHub - Profile</title>
-        <meta name="description" content="Manage your profile on BlogHub" />
-      </Helmet>
+            {/* Profile Info */}
+            <div className="card-body position-relative px-4 pb-4">
+              {/* Profile Image */}
+              <div
+                className="position-absolute"
+                style={{ top: "-70px" }}
+              >
+                <img
+                  src={user.profileImage}
+                  alt="Profile"
+                  className="rounded-circle border border-4 border-white shadow"
+                  style={{
+                    width: "140px",
+                    height: "140px",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
 
-      <div className="profile-card">
-        <h1 className="mb-3">Profile</h1>
+              {/* Edit Button */}
+              <div className="d-flex justify-content-end">
+                <button className="btn btn-outline-dark rounded-pill px-4">
+                  Edit Profile
+                </button>
+              </div>
 
-        <Form onSubmit={handleSave} className="profile-form d-flex gap-4">
-          <div className="profile-picture-section text-center">
-            <Image
-              src={userData?.profilePreviewImageUrl || profileImagePlaceholder}
-              roundedCircle
-              width={140}
-              height={140}
-              alt="Avatar"
-              loading='lazy'
-              onError={handleImageError}
-              className="profile-avatar mb-2"
-            />
+              {/* User Details */}
+              <div className="mt-5 pt-4">
+                <h2 className="fw-bold mb-1">{user.name}</h2>
+                <p className="text-muted mb-3">{user.username}</p>
 
-            <Form.Group controlId="avatar" className="d-flex justify-content-center">
-              <Form.Label className="camera-label mb-0">
-                <IoMdCamera />
-              </Form.Label>
-              <Form.Control
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="file-input d-none"
-              />
-            </Form.Group>
-          </div>
+                <p className="mb-4" style={{ maxWidth: "700px" }}>
+                  {user.bio}
+                </p>
 
-          <div className="flex-grow-1">
-            <Form.Group className="mb-3">
-              <Form.Label>Username</Form.Label>
-              <Form.Control
-                name="username"
-                value={userData.username}
-                onChange={handleChange}
-              />
-            </Form.Group>
+                {/* Extra Info */}
+                <div className="d-flex flex-wrap gap-4 text-muted mb-4">
+                  <span>📍 {user.location}</span>
+                  <span>📧 {user.email}</span>
+                  <span>
+                    🔗{" "}
+                    <a
+                      href={user.website}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-decoration-none"
+                    >
+                      Portfolio
+                    </a>
+                  </span>
+                  <span>🗓 Joined {user.joined}</span>
+                </div>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control value={userData.email} disabled className='bg-secondary-subtle' />
-            </Form.Group>
+                {/* Stats */}
+                <div className="row text-center g-3">
+                  <div className="col-md-4">
+                    <div className="border rounded-4 p-3">
+                      <h4 className="fw-bold mb-1">{user.posts}</h4>
+                      <p className="text-muted mb-0">Posts</p>
+                    </div>
+                  </div>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Date of Birth</Form.Label>
-              <Form.Control
-                type="date"
-                name="dob"
-                value={userData.dob}
-                onChange={handleChange}
-              />
-            </Form.Group>
+                  <div className="col-md-4">
+                    <div className="border rounded-4 p-3">
+                      <h4 className="fw-bold mb-1">{user.followers}</h4>
+                      <p className="text-muted mb-0">Followers</p>
+                    </div>
+                  </div>
 
-            <div className="d-flex justify-content-end">
-              <Button type="submit" className="primary-btn">
-                Save
-              </Button>
+                  <div className="col-md-4">
+                    <div className="border rounded-4 p-3">
+                      <h4 className="fw-bold mb-1">{user.following}</h4>
+                      <p className="text-muted mb-0">Following</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </Form>
+
+          {/* Recent Posts Section */}
+          <div className="card shadow border-0 rounded-4 mt-4">
+            <div className="card-body p-4">
+              <h4 className="fw-bold mb-4">Recent Posts</h4>
+
+              {[1, 2, 3].map((post) => (
+                <div
+                  key={post}
+                  className="border rounded-4 p-3 mb-3"
+                >
+                  <h5 className="fw-semibold">
+                    Blog Post Title {post}
+                  </h5>
+
+                  <p className="text-muted mb-2">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Humans continue placing divs inside divs hoping the CSS
+                    gods will show mercy.
+                  </p>
+
+                  <small className="text-secondary">
+                    Published 2 days ago
+                  </small>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-    </Container>
+    </div>
   );
 };
 
-export default Profile;
+export default ProfilePage;

@@ -1,0 +1,19 @@
+.admin-container {
+  min-height: 100vh;
+  background: #f6f7f9;
+}
+
+.admin-sidebar {
+  width: 240px;
+  background: white;
+  border-right: 1px solid #eee;
+  min-height: 100vh;
+}
+
+.admin-main {
+  background: #f6f7f9;
+}
+
+.admin-topbar {
+  background: white;
+}

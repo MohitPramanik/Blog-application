@@ -1,194 +1,71 @@
-import React, { lazy, memo, Suspense, useEffect, useState } from 'react';
-import {
-  Navbar,
-  Nav,
-  Container,
-  Image,
-  Dropdown,
-  Offcanvas
-} from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
-// import { useNotification } from '../context/NotificationContext';
-// import { FaBell } from "react-icons/fa6";
-import profileImgagePlaceholder from '../assets/common/profile-placeholder.jpg';
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import { useAppSelector } from '../store/hooks';
+import { Link, useNavigate } from 'react-router';
+import { Button } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
+import { logout } from '../store/features/auth/authSlice';
 
-const RiSunFill = lazy(() =>
-  import('react-icons/ri').then(m => ({ default: m.RiSunFill }))
-);
-const BsMoonStarsFill = lazy(() =>
-  import('react-icons/bs').then(m => ({ default: m.BsMoonStarsFill }))
-);
+export default function AppNavbar() {
+    const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-/* ---------- Theme Toggler ---------- */
-const ThemeToggler = memo(() => {
-  const { theme, toggleTheme } = useTheme();
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate("/login", {replace: true})
+    }
 
-  return (
-    <Dropdown align="end">
-      <Dropdown.Toggle variant="light">
-        <Suspense fallback={null}>
-          {theme === 'light'
-            ? <RiSunFill className="fs-5" />
-            : <BsMoonStarsFill className="fs-6" />}
-        </Suspense>
-      </Dropdown.Toggle>
+    return (
+        <Navbar expand="md" className="sticky-top bg-body-tertiary shadow-sm">
+            <Container fluid className='px-5'>
+                <Navbar.Brand as={Link} to="/" className='fw-bold'>BlogHub</Navbar.Brand>
+                <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-md`} />
+                <Navbar.Offcanvas
+                    id={`offcanvasNavbar-expand-md`}
+                    aria-labelledby="offcanvasNavbarLabel-expand-md"
+                    placement="end"
+                >
+                    <Offcanvas.Header closeButton>
+                        <Offcanvas.Title id="offcanvasNavbarLabel-expand-md">
+                            Offcanvas
+                        </Offcanvas.Title>
+                    </Offcanvas.Header>
+                    <Offcanvas.Body>
+                        <Nav className="justify-content-end flex-grow-1 pe-3">
+                            {
+                                isAuthenticated ?
+                                    <>
+                                        {
+                                            user.role === "Admin" && <Nav.Link as={Link} to="/admin">Dashboard</Nav.Link>
+                                        }
 
-      <Dropdown.Menu>
-        <Dropdown.Item
-          as="button"
-          active={theme === 'light'}
-          onClick={() => toggleTheme('light')}
-        >
-          <Suspense fallback={null}>
-            <RiSunFill className="me-2" /> Light Mode
-          </Suspense>
-        </Dropdown.Item>
-        <Dropdown.Item
-          as="button"
-          active={theme === 'dark'}
-          onClick={() => toggleTheme('dark')}
-        >
-          <Suspense fallback={null}>
-            <BsMoonStarsFill className="me-2" /> Dark Mode
-          </Suspense>
-        </Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
-  );
-});
-
-/* ---------- Profile Dropdown ---------- */
-const ProfileDropDown = memo(() => {
-  const { logout, user } = useAuth();
-
-  return (
-    <Dropdown align="end">
-      <Dropdown.Toggle variant="light">
-        <Image
-          src={user?.profileImageUrl || profileImgagePlaceholder}
-          roundedCircle
-          width={28}
-          height={28}
-          alt="Avatar"
-          loading="lazy"
-          className="object-fit-cover"
-        />
-      </Dropdown.Toggle>
-
-      <Dropdown.Menu>
-        <Dropdown.Item as={Link} to="/profile">Profile</Dropdown.Item>
-        <Dropdown.Item as={Link} to="/my-blogs">My Blogs</Dropdown.Item>
-        <Dropdown.Item as={Link} to="/saved-blogs">Saved Blogs</Dropdown.Item>
-        <Dropdown.Divider />
-        <Dropdown.Item as="button" onClick={logout}>Logout</Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
-  );
-});
-
-const NavBar: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const { theme } = useTheme();
-
-  const [expanded, setExpanded] = useState<boolean>(false);
-
-  useEffect(() => {
-    import('../styles/Navbar.css');
-  }, [])
-
-  const handleCloseExpanded = () => {
-    setExpanded(false);
-  }
-
-  const handleOpenExpanded = () => {
-    setExpanded(true);
-  }
-
-  return (
-    <Navbar
-      bg={theme}
-      variant={theme === 'dark' ? 'dark' : 'light'}
-      expand="lg"
-      sticky="top"
-      className="navbar-custom"
-    >
-      <Container>
-
-        <div>
-          {/* Mobile: Hamburger (LEFT) */}
-          <Navbar.Toggle
-            aria-controls="offcanvas-navbar"
-            className="me-2 d-lg-none"
-            onClick={handleOpenExpanded}
-          />
-
-          {/* Brand */}
-          <Navbar.Brand as={Link} to="/" className="fw-bold fs-5">
-            📝 BlogHub
-          </Navbar.Brand>
-        </div>
-
-
-        {/* Desktop Nav Links */}
-        {isAuthenticated && (
-          <Nav className="ms-auto d-none d-lg-flex gap-2">
-            <Nav.Link as={Link} to="/blogs">Feed</Nav.Link>
-            <Nav.Link as={Link} to="/write">Create</Nav.Link>
-            <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
-          </Nav>
-        )}
-
-        {/* Right-side icons (ALL sizes) */}
-        <div className="ms-2 d-flex align-items-center gap-2">
-          {isAuthenticated && (
-            <>
-              <ThemeToggler />
-              <ProfileDropDown />
-            </>
-          )}
-        </div>
-
-        {/* Mobile Offcanvas */}
-        <Navbar.Offcanvas
-          id="offcanvas-navbar"
-          show={expanded}
-          placement="start"
-          className="d-lg-none"
-          bg={theme}
-          variant={theme === 'dark' ? 'dark' : 'light'}
-        >
-          <Offcanvas.Header
-            closeButton
-            onHide={handleCloseExpanded}
-            className={theme === 'dark' ? 'offcanvas-dark-header' : ''}
-          >
-            <Offcanvas.Title>📝 BlogHub</Offcanvas.Title>
-          </Offcanvas.Header>
-
-          <Offcanvas.Body>
-            <Nav className="flex-column gap-2">
-              {isAuthenticated ? (
-                <>
-                  <Nav.Link as={Link} onClick={handleCloseExpanded} to="/blogs">Feed</Nav.Link>
-                  <Nav.Link as={Link} onClick={handleCloseExpanded} to="/write">Create</Nav.Link>
-                  <Nav.Link as={Link} onClick={handleCloseExpanded} to="/categories">Categories</Nav.Link>
-                </>
-              ) : (
-                <>
-                  <Nav.Link as={Link} onClick={handleCloseExpanded} to="/login">Login</Nav.Link>
-                  <Nav.Link as={Link} onClick={handleCloseExpanded} to="/signup">Signup</Nav.Link>
-                </>
-              )}
-            </Nav>
-          </Offcanvas.Body>
-        </Navbar.Offcanvas>
-
-      </Container>
-    </Navbar>
-  );
-};
-
-
-export default NavBar;
+                                        <Nav.Link as={Link} to="/blogs">Explore</Nav.Link>
+                                        <Nav.Link as={Link} to="/blogs/create">Create</Nav.Link>
+                                        <Nav.Link as={Link} to="/blogs/categories">Categories</Nav.Link>
+                                        <NavDropdown
+                                            title="Dropdown"
+                                            id="offcanvasNavbarDropdown-expand-md"
+                                        >
+                                            <NavDropdown.Item as={Link} to="/profile">Profile</NavDropdown.Item>
+                                            <NavDropdown.Item as={Link} to="/settings">Settings</NavDropdown.Item>
+                                            <NavDropdown.Item as={Button} onClick={handleLogout}>Logout</NavDropdown.Item>
+                                        </NavDropdown>
+                                    </> :
+                                    <>
+                                        <Nav.Link as={Link} to="/">Home</Nav.Link>
+                                        <Nav.Link as={Link} to="/faq">FAQ</Nav.Link>
+                                        <Nav.Link as={Link} to="/login">Login</Nav.Link>
+                                        <Nav.Link as={Link} to="/signup">Signup</Nav.Link>
+                                    </>
+                            }
+                        </Nav>
+                    </Offcanvas.Body>
+                </Navbar.Offcanvas>
+            </Container>
+        </Navbar>
+    );
+}

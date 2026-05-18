@@ -1,14 +1,14 @@
 import React, { memo } from 'react';
 import { Container } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import '../styles/Footer.css';
 import { FaLinkedin, FaInstagram, FaGithub } from "react-icons/fa";
+import { Link } from 'react-router';
 
 const Footer: React.FC = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="app-footer py-4 mt-5">
+    <footer className="app-footer py-4">
       <Container>
         <div className="d-flex justify-content-md-between justify-content-center align-items-center flex-column flex-md-row gap-3">
 

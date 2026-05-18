@@ -1,90 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Spinner } from 'react-bootstrap';
-import BlogCard from '../components/BlogCard';
-import type { Blog } from '../types';
-import '../styles/BlogList.css';
-import api from '../api/axiosInstance';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { PAGE_SIZE } from "../constants/constant";
-import PaginationBtns from '../components/PaginationBtns';
-import { Helmet } from 'react-helmet-async';
+import { Col, Container, Row } from "react-bootstrap";
+import type { Blog } from "../types/Blog";
+import { useState } from "react";
+import BlogCard from "../components/BlogCard";
 
-const SavedBlogs: React.FC = () => {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [totalBlogCount, setTotalBlogCount] = useState<number>(0);
+export default function SavedBlogs() {
 
-  const fetchSavedBlogs = async (page = 1, limit = PAGE_SIZE || 12) => {
-    try {
-      setLoading(true);
+    const [blogs, setBlogs] = useState<Blog[]>([]);
 
-      let response = await api.get(`saved-blogs?page=${page}&limit=${limit}`);
+    return (
+        <div className="min-vh-100">
+            <Container className="py-5">
+                <div className="mb-4">
+                    <h1 className="fw-bold display-6 mb-2 text-primary">
+                        🔖 Saved Blogs
+                    </h1>
 
-      setBlogs(response.data.data);
-      setTotalBlogCount(response.data.total_records_count);
-    }
-    catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data.message);
-      }
-      console.log(error);
-    }
-    finally {
-      setLoading(false);
-    }
-  }
+                    <p className="text-muted mb-0 px-5">
+                        Blogs you've saved to read later
+                    </p>
+                </div>
 
-  useEffect(() => {
-    fetchSavedBlogs();
-  }, [])
+                {blogs.length ? (
+                    <Row className="g-4">
+                        {blogs.map((blog) => (
+                            <Col key={blog._id} xs={12} md={6} lg={4}>
+                                <BlogCard blog={blog} />
+                            </Col>
+                        ))}
+                    </Row>
+                ) : (
+                    <div className="text-center py-5">
+                        <h3 className="text-muted">No saved blogs</h3>
+                        <p className="text-muted">Save interesting articles from the feed to read later</p>
+                    </div>
+                )}
 
-  return (
-    <div className="blog-list-page">
 
-      <Helmet>
-        <title>BlogHub - Saved Blogs</title>
-        <meta name="description" content="View your saved blogs on BlogHub" />
-      </Helmet>
+            </Container>
+        </div>
+    )
+}
 
-      <Container className="py-5">
-        <Row className="mb-5">
-          <Col md={8}>
-            <h1 className="mb-2 fw-bold">🔖 Saved Blogs</h1>
-            <p className="text-muted">Blogs you've saved to read later</p>
-          </Col>
-        </Row>
-
-        {loading ? (
-          <div className="text-center py-5">
-            <Spinner animation="border" role="status" variant="primary">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-          </div>
-        ) : (
-          <>
-            {blogs.length > 0 ? (
-              <Row className="g-4">
-                {blogs.map((blog, index) => (
-                  <Col key={index} xs={12} md={6} lg={4}>
-                    <BlogCard blog={blog} />
-                  </Col>
-                ))}
-              </Row>
-            ) : (
-              <div className="text-center py-5">
-                <h3 className="text-muted">No saved blogs</h3>
-                <p className="text-muted">Save interesting articles from the feed to read later</p>
-              </div>
-            )}
-          </>
-        )}
-      </Container>
-
-      <PaginationBtns fetchBlogs={fetchSavedBlogs} totalCount={totalBlogCount} />
-    </div>
-  );
-};
-
-export default SavedBlogs;
 
